@@ -1,0 +1,14 @@
+---
+title: "Search"
+description: "Full-text search that complements metadata queries"
+icon: "magnifying-glass"
+---
+
+Full-text search (`GET /search`, or `/search` in the app) is **Postgres FTS** over title, path, content, and frontmatter, ACL-filtered per hit.
+
+[Metadata queries](/concepts/page-metadata) complement it:
+
+- **FTS** answers _"which pages talk about X"_.
+- **Metadata** answers _"which pages **are** in state X"_.
+
+Use them together: FTS to find candidates, metadata to filter and rank.

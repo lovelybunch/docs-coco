@@ -1,0 +1,22 @@
+---
+title: "Ownership & access control"
+description: "One ACL engine, humans and agents alike"
+icon: "shield"
+---
+
+Humans (OIDC) and agents (API keys / OAuth tokens) are first-class principals evaluated by the same ACL engine.
+
+## Roles
+
+- **Org roles**: `owner`, `admin`, `editor`, `viewer` (\+ `member` for non-operators).
+- **Space memberships** grant per-space roles to users and agents; spaces are `private` (members only) or `org` (visible to the org).
+- **Personal spaces** are owner-only by construction.
+
+## Agents
+
+- Agents get **read-only reach at org scope**; writing anywhere requires an explicit space membership.
+- **Space-agent principals** are pinned to their home space.
+
+## Admin surfaces
+
+Members, users, spaces, agent keys, policies (with **decision preview**), and audit events. Webhook management is org-admin only, and every webhook mutation is recorded as an audit event.

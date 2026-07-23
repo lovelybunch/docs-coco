@@ -1,0 +1,42 @@
+---
+title: "Export & import"
+description: "Portable space bundles for dev→prod, sharing, and snapshots"
+icon: "arrows-up-down"
+---
+
+Spaces are portable. An export is a self-contained JSON bundle of every page you can read in the space — current version, frontmatter, content, and metadata:
+
+```json
+{
+  "format": "coco-space-export",
+  "formatVersion": 1,
+  "exportedAt": "2026-07-19T08:00:00.000Z",
+  "space": { "slug": "deals", "name": "Deals", "description": "…" },
+  "pages": [
+    { "path": "acme", "title": "Acme Corp", "frontmatter": {}, "content": "…",
+      "version": 4, "updatedAt": "…", "metadata": { "stage": "diligence" } }
+  ]
+}
+```
+
+## Export
+
+`GET /spaces/:slug/export` (or the **Export** button on the space manage page). Requires list access to the space; only pages you can read are included. Revision history intentionally stays home — a bundle is a portable snapshot.
+
+## Import
+
+`POST /spaces/:slug/import?mode=skip|overwrite` with a bundle body (or the **Import** button). Paths are space-relative, so a bundle exported from `deals` can be imported into `pipeline`.
+
+- `skip` (default) leaves existing pages alone.
+- `overwrite` writes new revisions (nothing is ever destroyed — revisions are append-only).
+- Metadata is applied after each page.
+- The response summarizes `{created, updated, skipped, errors[]}`.
+
+Imports go through the same core write path as everything else: ACLs are enforced per page, revisions record the importing principal as author, and webhooks fire.
+
+## Uses
+
+- Moving a solution between deployments (dev → prod)
+- Sharing a template kit
+- Seeding a new customer's workspace
+- Snapshots before large changes

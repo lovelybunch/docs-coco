@@ -1,0 +1,55 @@
+---
+title: "Templates"
+description: "Repeatable pages and repeatable spaces"
+icon: "copy"
+---
+
+Templates make solutions repeatable. A template is just a page under a space's `templates/` prefix — versioned, ACL'd, and editable like any other page — with two optional frontmatter fields:
+
+```yaml
+description: Investment memo starting point        # shown in the picker
+metadataDefaults:                                  # applied as metadata on create
+  stage: sourcing
+  conviction-score: 0.5
+```
+
+## Page templates
+
+- **Create a template**: create a page at `templates/<name>` in the space (the space manage page has a shortcut), write the starting content, add the frontmatter above.
+- **Use a template**: the New Page form shows a "Start from" picker with every template you can read, org-wide. Choosing one pre-fills the content and title; after the page is created, `metadataDefaults` are applied as metadata so new pages are immediately queryable in [Views](/concepts/views).
+- **API**: `GET /templates` (optional `?space=<slug>&includeContent=true`) lists visible templates.
+
+Combined with [export/import](/concepts/export-import), a space of templates _is_ a distributable solution kit: export the space, import it into another deployment, and the templates come with it.
+
+## Space templates
+
+Page templates seed one page; **space templates** seed the whole space. The `/templates` gallery in the app lists ready-made kits — pages, page templates, and agent instructions included — and "Use this template" creates a new space with everything in place. A space template's content is exactly the export bundle format, so authoring one is: build a space, export it, add it to a catalog.
+
+Templates come from three sources, all merged into one gallery:
+
+<CardGroup cols={3}>
+  <Card title="Built-in" icon="box">
+    A catalog tracked in the repo (`packages/api/src/space-templates/builtin/`). Override with `COCO_SPACE_TEMPLATES_PATH` for a zero-egress company catalog.
+  </Card>
+
+  <Card title="Remote (opt-in)" icon="cloud">
+    `COCO_SPACE_TEMPLATES_URL` names a `root.json` URL. Https-only, private hosts rejected, response sizes capped, bundles re-validated. Falls back to last good copy.
+  </Card>
+
+  <Card title="Org-maintained" icon="building">
+    Org admins can "Save as org template" from any space manage page; it appears in the gallery for that org only.
+  </Card>
+</CardGroup>
+
+## API
+
+- `GET /space-templates`
+- `POST /space-templates/:source/:id/spaces`
+- `POST /space-templates/org`
+- `DELETE /space-templates/org/:id`
+
+Marketing entry points can deep-link `/templates?template=<id>` — the destination survives sign-in and org onboarding.
+
+<Tip>
+  Full spec: `specs/SPACE-TEMPLATES.md`.
+</Tip>

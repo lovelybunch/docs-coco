@@ -1,0 +1,21 @@
+---
+title: "Pages"
+description: "CRUD, versions, metadata, and links"
+icon: "file-lines"
+---
+
+| Method & path | Purpose |
+| --- | --- |
+| `GET /pages/:space/:path` | Read a page (HTML; `.md` or `Accept: text/markdown` for markdown; `?version=n` for history) |
+| `PUT /pages/:space/:path` | Create (`201`) or update (needs `If-Match`) |
+| `GET /pages/:space/:path/versions` | Revision history |
+| `POST /pages/:space/:path/versions/:n/make-latest` | Promote an old revision |
+| `GET /pages/:space/:path/metadata` | Read metadata |
+| `PATCH /pages/:space/:path/metadata` | Merge-patch metadata |
+| `GET /pages/:space/:path/metadata/history` | Per-key audit trail |
+| `GET /pages/:space/:path/links` | Outbound links \+ backlinks |
+| `GET /pages/personal…` | Personal-space equivalents of the page routes |
+
+<Tip>
+  Optimistic concurrency: updating an existing page requires `If-Match` with the current ETag. A mismatch returns `412 Precondition Failed`.
+</Tip>

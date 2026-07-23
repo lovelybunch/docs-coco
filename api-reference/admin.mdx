@@ -1,0 +1,31 @@
+---
+title: "Admin & templates"
+description: "Webhooks, page templates, and space templates"
+icon: "gear"
+---
+
+## Webhooks (org admin)
+
+| Method & path | Purpose |
+| --- | --- |
+| `GET/POST /admin/webhooks` | List / create (signing secret returned once) |
+| `PATCH /admin/webhooks/:id` | Update URL, events, space filter, enable/disable |
+| `POST /admin/webhooks/:id/rotate-secret` | Rotate signing secret |
+| `POST /admin/webhooks/:id/test` | Send a `webhook.test` delivery |
+| `DELETE /admin/webhooks/:id` | Remove a subscription |
+| `GET /admin/webhooks/:id/deliveries` | Delivery log |
+
+## Page templates
+
+| Method & path | Purpose |
+| --- | --- |
+| `GET /templates` | Visible page templates (`?space=<slug>&includeContent=true`) |
+
+## Space templates
+
+| Method & path | Purpose |
+| --- | --- |
+| `GET /space-templates` | Gallery of built-in, remote, and org-maintained templates |
+| `POST /space-templates/:source/:id/spaces` | Create a new space from a template |
+| `POST /space-templates/org` | Snapshot a space as an org-maintained template |
+| `DELETE /space-templates/org/:id` | Remove an org-maintained template |

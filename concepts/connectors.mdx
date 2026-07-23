@@ -1,0 +1,15 @@
+---
+title: "Connectors"
+description: "How agents reach external systems"
+icon: "plug"
+---
+
+Agents reach external systems (Slack, Linear, Google Drive, Day.ai, Notion, Sentry, Stripe, Box, …) through **connectors**.
+
+- Credentials are stored **encrypted**, scoped to the org or overridden per space.
+- OAuth-based connectors handle the grant flow from the space's **Connections** page.
+- Custom **MCP/OpenAPI** connections can be added per deployment.
+
+<Note>
+  Encrypted credentials require `COCO_SETTINGS_ENCRYPTION_KEY` on the API runtime. See [Operations](/operations/deployment).
+</Note>

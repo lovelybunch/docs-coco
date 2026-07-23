@@ -1,0 +1,23 @@
+---
+title: "Manufacturing — supplier & audit"
+description: "Concentration risk and portable audit evidence"
+icon: "industry"
+---
+
+One page per vendor (`supply/vendor-<name>`).
+
+**Metadata**: `audit-score`, `next-audit`, `certifications` (array), `single-source`, `open-capas`.
+
+**Concentration risk view**:
+
+```text
+single-source = true AND audit-score < 0.8
+```
+
+**Line-transfer qualification**:
+
+```text
+certifications contains "ISO-13485"
+```
+
+Export the space as the auditor's evidence bundle.

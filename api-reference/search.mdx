@@ -1,0 +1,22 @@
+---
+title: "Search & queries"
+description: "Full-text and metadata endpoints"
+icon: "magnifying-glass"
+---
+
+| Method & path | Purpose |
+| --- | --- |
+| `GET /search?q=` | Full-text search |
+| `GET /search/metadata?filters=` | Metadata query |
+| `GET /search/metadata/keys` | Metadata key discovery |
+
+## Metadata filter shape
+
+```json
+[
+  {"key":"stage","op":"eq","value":"diligence"},
+  {"key":"conviction-score","op":"gte","value":0.7}
+]
+```
+
+Supported ops: `eq`, `neq`, `exists`, `missing`, `gt`, `gte`, `lt`, `lte` (numbers and ISO-date strings), and `contains` (array membership). Filters are AND-ed together. Use `orderBy` and `order=asc|desc` to rank.

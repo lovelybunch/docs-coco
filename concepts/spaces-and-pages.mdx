@@ -1,0 +1,28 @@
+---
+title: "Spaces & pages"
+description: "The org → space → page policy model"
+icon: "sitemap"
+---
+
+The policy model is `org → space → page`.
+
+- An **organization** is the tenant. Single-tenant deployments have exactly one.
+- A **space** groups pages around a purpose (`deals`, `ops`, `sales`) with its own members, visibility (`private` or `org`), and agent. Every user also has a private **personal space** (`personal/...`).
+- A **page** is addressed as `spaceSlug/pagePath` (paths can nest: `deals/2026/acme`). Pages carry a title, YAML-like **frontmatter** (document-describing values that travel with a version), markdown **content**, and **metadata** (see [Page metadata](/concepts/page-metadata)).
+
+## Optimistic concurrency
+
+Writes are optimistically concurrent: updating an existing page requires `If-Match` with the current version's ETag; a mismatch returns `412`.
+
+## Reserved prefixes
+
+Every space reserves two page prefixes:
+
+- `agents/` — the space agent's instructions, tasks, and run records.
+- `templates/` — page templates (see [Templates](/concepts/templates)).
+
+Both are hidden from general listings and search; address them directly to read or edit.
+
+<Card title="Next: Page metadata" icon="database" href="/concepts/page-metadata">
+  Structured key-value data stored alongside every page.
+</Card>

@@ -1,0 +1,41 @@
+---
+title: "Page metadata"
+description: "Queryable, auditable, patchable key-value state alongside every page"
+icon: "database"
+---
+
+Structured key-value data stored **alongside** a page, not inside it. Changing a key never creates a page revision — it updates one row and writes one audit event.
+
+## What you get
+
+- **Values are any JSON**: `0.92`, `true`, `["a","b"]`, `{"due":"2026-08-01"}`.
+- **Merge-patch writes**: send only the keys you're changing.
+  - `set` upserts (JSON `null` deletes)
+  - `append` extends arrays atomically
+  - `appendUnique` skips duplicates so re-run agents are idempotent
+- **Per-key audit trail**: who set what, when, with previous values.
+- **Queryable**: `eq`, `neq`, `exists`, `missing`, `gt/gte/lt/lte` (numbers and ISO-date strings), `contains` (array membership), AND-ed together, with `orderBy` ranking.
+- **Discoverable**: `GET /search/metadata/keys` lists the key namespace with usage counts so writers converge on existing keys.
+
+## Patch example
+
+```bash
+curl -X PATCH "http://localhost:8787/pages/demo/customer-acme/metadata" \
+  -H "Authorization: Bearer dev-agent-key-change-me" \
+  -H "Content-Type: application/json" \
+  -d '{"set":{"stage":"diligence","conviction-score":0.8},
+       "appendUnique":{"sources":["https://news.example/acme"]}}'
+```
+
+## Query example
+
+```bash
+curl -G "http://localhost:8787/search/metadata" \
+  -H "Authorization: Bearer dev-agent-key-change-me" \
+  --data-urlencode 'filters=[{"key":"stage","op":"eq","value":"diligence"},{"key":"conviction-score","op":"gte","value":0.7}]' \
+  --data-urlencode 'orderBy=conviction-score' --data-urlencode 'order=desc'
+```
+
+<Tip>
+  Full details and design rationale live in the repo at `specs/PAGE-METADATA.md`.
+</Tip>

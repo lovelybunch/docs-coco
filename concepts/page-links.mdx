@@ -1,0 +1,24 @@
+---
+title: "Page links"
+description: "Backlinks, outbound links, and broken-link reports — automatic"
+icon: "link"
+---
+
+Internal Markdown links (`/pages/space/path` absolute and `./sibling`-style relative forms) are extracted from the body on every write and indexed automatically — no separate API to keep in sync.
+
+- Every page answers **"what links here"** (backlinks).
+- **Outbound links** flag targets that don't exist yet (they heal when the target page is created).
+- A **space-wide broken-link report** keeps the corpus honest.
+
+## APIs
+
+- `GET /pages/:space/:path/links`
+- `GET /spaces/:slug/links/broken`
+- `context_get_page_links` MCP tool
+- The **"Linked from"** card on the page view
+
+Backlinks are ACL-filtered per source page, like search hits. Pre-existing corpora index via org-admin `POST /links/rebuild`.
+
+<Tip>
+  Full spec: `specs/PAGE-LINKS.md`.
+</Tip>

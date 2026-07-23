@@ -1,0 +1,17 @@
+---
+title: "Legal — contract repository"
+description: "Plain-language summaries with auto-renewal sweeps"
+icon: "file-signature"
+---
+
+One page per agreement (`contracts/<counterparty>`): an agent-written plain-language summary.
+
+**Metadata**: `renewal-date`, `auto-renews`, `risk-score`, `counterparty`, `governing-law`, `clauses-flagged`.
+
+The GC's monthly sweep:
+
+```text
+auto-renews = true AND renewal-date < <90 days out>
+```
+
+Ordered by `risk-score` desc — with per-key history for _"who lowered this risk score, and when."_

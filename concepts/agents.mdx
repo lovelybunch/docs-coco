@@ -1,0 +1,26 @@
+---
+title: "Agents"
+description: "Every space has one agent — persona, tasks, schedules, run records"
+icon: "robot"
+---
+
+Every space has exactly one agent — a logical identity defined by pages in its space:
+
+| Page | Role |
+| --- | --- |
+| `<space>/agents/instructions` | The agent's persona, layered into every run |
+| `<space>/agents/<task>` | A task the agent runs on demand or on a schedule |
+| `<space>/agents/runs/<task>/<run-id>` | A run record (status, output, usage) |
+
+## Schedules
+
+Schedules live in task frontmatter (`schedule`, `scheduleTz`, `scheduleEnabled`) and are edited from the task page's Schedule card.
+
+## Execution authority
+
+- **Scheduled runs** execute as the **space agent principal** — write access in the home space, read-only on org-visible spaces, no access to other private spaces.
+- **Manual runs** execute with the requesting user's authority.
+
+<Tip>
+  Architecture: `specs/SPACE-AGENT-ARCHITECTURE.md`.
+</Tip>

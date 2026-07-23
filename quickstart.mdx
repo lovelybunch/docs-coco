@@ -1,47 +1,61 @@
 ---
 title: "Quickstart"
-description: "Begin with a guide on the fastest path to a successful outcome"
+description: "From zero to a queryable, agent-driven page in 15 minutes"
+icon: "rocket"
 ---
 
-Describe how someone begins using your product. What is the first thing they need to do? Are there any prerequisites?
+This guide takes you from a clean checkout to a running Coco stack — page, metadata, cross-page query, and a webhook — in under fifteen minutes.
 
-A quickstart should take someone from zero to using your product. They'll get a quick win and a sense of what they can accomplish.
+## Run the stack
 
-## Prerequisites
+```bash
+pnpm install
+./scripts/compose-local.sh up     # Postgres + API (8787) + app (3000), migrated + seeded
+```
 
-Before you begin, you must have:
-
-- Requirement one (for example, Node.js 18+, a free account, an API key)
-- Requirement two (for example, a compatible device, a compatible browser, a compatible operating system)
-
-## Get started
+Open [http://localhost:3000](http://localhost:3000). The seeded identity is `demo@local` in the `demo` space.
 
 <Steps>
-  <Step title="Install">
-    Describe how to install your product or sign up.
-
+  <Step title="Create a page (as an agent)">
     ```bash
-    npm install your-package
+    curl -X PUT "http://localhost:8787/pages/demo/customer-acme" \
+      -H "Authorization: Bearer dev-agent-key-change-me" \
+      -H "Content-Type: application/json" \
+      -d '{"title":"Acme Corp","content":"# Acme\n\nResearch notes...","frontmatter":{}}'
     ```
   </Step>
-  <Step title="Configure">
-    Describe any setup or configuration needed before first use.
-
+  <Step title="Attach structured metadata">
     ```bash
-    your-cli init
+    curl -X PATCH "http://localhost:8787/pages/demo/customer-acme/metadata" \
+      -H "Authorization: Bearer dev-agent-key-change-me" \
+      -H "Content-Type: application/json" \
+      -d '{"set":{"stage":"diligence","conviction-score":0.8},
+           "appendUnique":{"sources":["https://news.example/acme"]}}'
     ```
   </Step>
-  <Step title="Run it">
-    Show the first thing a user does to see it working.
-
+  <Step title="Query across pages">
     ```bash
-    your-cli start
+    curl -G "http://localhost:8787/search/metadata" \
+      -H "Authorization: Bearer dev-agent-key-change-me" \
+      --data-urlencode 'filters=[{"key":"stage","op":"eq","value":"diligence"},{"key":"conviction-score","op":"gte","value":0.7}]' \
+      --data-urlencode 'orderBy=conviction-score' --data-urlencode 'order=desc'
     ```
+
+    Humans run the same query in the browser at **Views** (`/views`) — filters, ordering, and a results table, shareable as a URL.
+  </Step>
+  <Step title="Get notified">
+    Create a webhook in **Admin → Manage webhooks** (or `POST /admin/webhooks`), and every page or metadata change POSTs a signed JSON payload to your endpoint.
   </Step>
 </Steps>
 
-<Tip>
-  Give people a way to get help. This could be a link to a support page, a chat with a customer support agent, or a forum for your product.
+## Next steps
 
-  Example: Need help? Reach out to us at [support@yourcompany.com](mailto:support@yourcompany.com).
-</Tip>
+<CardGroup cols={2}>
+  <Card title="Learn the model" icon="sitemap" href="/concepts/spaces-and-pages">
+    Orgs, spaces, pages, and how ACLs flow through them.
+  </Card>
+
+  <Card title="Explore examples" icon="lightbulb" href="/examples/deal-pipeline">
+    Real solutions built on the same primitives.
+  </Card>
+</CardGroup>

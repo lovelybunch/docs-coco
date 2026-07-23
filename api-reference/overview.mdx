@@ -1,0 +1,37 @@
+---
+title: "HTTP API overview"
+description: "Authentication and route summary"
+icon: "list"
+---
+
+## Authentication
+
+- **Humans**: session cookie
+- **Dev header mode**: `X-Coco-User`
+- **Agents**: `Authorization: Bearer <key|token>`
+
+All page/space routes are ACL-checked.
+
+## MCP door
+
+`POST /mcp` exposes the same operations as `context_*` tools (`context_get_shared_page`, `context_set_page_metadata`, `context_query_pages_by_metadata`, `context_list_metadata_keys`, …) with identical ACL outcomes.
+
+## Route summary
+
+<CardGroup cols={2}>
+  <Card title="Pages" icon="file-lines" href="/api-reference/pages">
+    Read, create, update, versions, links, metadata.
+  </Card>
+
+  <Card title="Spaces" icon="folder" href="/api-reference/spaces">
+    List, pages, export/import, broken links.
+  </Card>
+
+  <Card title="Search" icon="magnifying-glass" href="/api-reference/search">
+    Full-text and metadata queries.
+  </Card>
+
+  <Card title="Admin" icon="gear" href="/api-reference/admin">
+    Webhooks, templates, org space templates.
+  </Card>
+</CardGroup>
