@@ -1,29 +1,31 @@
 ---
 title: "Introduction"
-description: "Coco (Coconut Context) — a solution platform built on pages"
+description: "Coconut Context: a solution platform built on pages"
 icon: "coconut"
 ---
 
-Coco is a **solution platform built on pages**. A page is a markdown document that reads identically to a human in a browser and to an agent over HTTP or MCP, carries **structured metadata** (queryable key-value data), and lives in a **space** with real access control. Every space has **one agent** that can run tasks on demand or on a schedule, using connectors to outside systems.
+Coconut Context is a solution platform built on pages. A page is a markdown document: a person reads it in a browser, and an agent reads the same page over HTTP or MCP. Every page carries **structured metadata** (queryable key-value data) and lives in a **space** with real access control. Each space also has **one agent** that can run tasks on demand or on a schedule, using connectors to reach your other tools.
 
-That combination — narrative \+ structured data \+ an agent \+ integrations — is what turns a wiki into an application platform:
+Put those pieces together and a wiki starts acting like an application:
 
-- The **page body** is the human-readable narrative (an investment memo, a runbook, an account brief).
-- The **metadata** is the machine-readable state that churns (a stage, a score, a growing list of sources) — individually patchable, audited per key, and queryable across pages without touching the document.
-- The **space agent** keeps both fresh: it folds new information into the prose and updates the metadata, on demand or on a schedule.
-- **Webhooks, export/import, and templates** connect the result to the rest of your stack and make solutions repeatable.
+- The **page body** is the human-readable narrative: an investment memo, a runbook, an account brief.
+- The **metadata** is the state that actually changes: a stage, a score, a growing list of sources. Each key is patchable and audited on its own, and queryable across pages without opening the document.
+- The **space agent** keeps both current, folding new information into the prose and updating the metadata, on demand or on a schedule.
+- **Webhooks, export/import, and templates** connect a space to the rest of your stack, so a solution you build once is one you can repeat.
 
-## The three doors
+## Three ways to reach a page
 
-One page, one resolver, three doors — all governed by the same ACL engine:
+Whether you're a person in a browser, an agent calling the HTTP API, or an MCP client, you hit the same resolver and the same access control. Three interfaces, one set of rules:
 
-| Door | Who | How |
+| Interface | Who uses it | How |
 | --- | --- | --- |
-| Browser | Humans | Rendered HTML at `/pages/:space/:path` |
-| HTTP API | Agents & systems | `Accept: text/markdown` (or `.md`) returns clean markdown; JSON endpoints for everything else |
-| MCP | AI agents | `context_*` tools over JSON-RPC with OAuth or bearer auth |
+| Browser | People | Rendered HTML at `/pages/:space/:path` |
+| HTTP API | Agents and scripts | `Accept: text/markdown` (or `.md`) returns clean markdown; JSON for everything else |
+| MCP | AI agents and IDEs | `context_*` tools over JSON-RPC, with OAuth or bearer auth |
 
-Pages are versioned in Postgres as append-only revisions — no git lifecycle. Every write is a new revision; historical reads are one query parameter away.
+You don't have to talk to the HTTP API by hand. The [Coconut CLI](https://github.com/lovelybunch/coconut-cli) (`npm i coconut`, then run it as `coco` or `coconut`) drives spaces, pages, metadata, and agents from a terminal or a CI job. The [Coconut SDK](https://github.com/lovelybunch/coconut-sdk) (`npm i coconut-sdk`) is the typed TypeScript client the CLI itself is built on: reach for it when a script or an agent needs more than the CLI gives you.
+
+Pages are versioned in Postgres as append-only revisions, not a git lifecycle. Every write is a new revision, and reading an older one is one query parameter away.
 
 ## Explore the docs
 
