@@ -1,12 +1,12 @@
 ---
 title: "Introduction"
-description: "Coconut Context: a solution platform built on pages"
+description: "Coconut: a context backend for agents"
 icon: "coconut"
 ---
 
-Coconut Context is a solution platform built on pages. A page is a markdown document: a person reads it in a browser, and an agent reads the same page over HTTP or MCP. Every page carries **structured metadata** (queryable key-value data) and lives in a **space** with real access control. Each space also has **one agent** that can run tasks on demand or on a schedule, using connectors to reach your other tools.
+Coconut is a context backend for agents, built on pages. A **space** is a namespace: it groups related pages under one set of access rules. A **page** is durable narrative, a markdown document a person reads in a browser and an agent reads over that same HTTP or MCP interface. **Metadata** turns that narrative into a queryable index, structured key-value data you can filter and search across pages without opening the document. And each space carries **one agent** that runs against that same corpus, on demand or on a schedule, using connectors to reach your other tools. The pattern underneath all of it: write context into a page once, retrieve it later by search or by structure, then let an agent act on it.
 
-Put those pieces together and a wiki starts acting like an application:
+Put those pieces together and you get something closer to organizational memory a model can trust than a wiki with tags:
 
 - The **page body** is the human-readable narrative: an investment memo, a runbook, an account brief.
 - The **metadata** is the state that actually changes: a stage, a score, a growing list of sources. Each key is patchable and audited on its own, and queryable across pages without opening the document.
