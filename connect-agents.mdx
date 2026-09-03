@@ -1,0 +1,41 @@
+---
+title: "Connect your agents"
+description: "Connector URLs, agent tokens, and MCP client configuration for programmatic access"
+icon: "terminal"
+---
+
+Coconut speaks [MCP](https://modelcontextprotocol.io/), so any MCP-compatible client can read and write your context directly instead of working from a static export. Every setup has the same shape: get a connector URL from the app, drop in an agent token, and point your client at it.
+
+Your exact connector URL and a ready-made config snippet are in the app at [Integrations](https://app.coconut.md/integrations). Agent tokens are created from [Admin → Agent Keys](https://app.coconut.md/admin/agent-keys). Generate one before you start the setup below.
+
+<Tip>
+  Setting up Claude, ChatGPT, Microsoft 365 Copilot, or Cursor? See [Connect your tools](/connect-tools) for the walkthrough for each of those. This page covers any other MCP client, and the configuration mechanics behind all of them.
+</Tip>
+
+## Any MCP client
+
+Any MCP-compatible client connects the same way: point it at the connector URL and authenticate. A typical config file entry looks like this:
+
+```json
+{
+  "mcpServers": {
+    "coconut": {
+      "name": "coconut",
+      "enabled": true,
+      "description": "Coconut MCP server",
+      "type": "http",
+      "url": "https://api.coconut.md/mcp",
+      "headers": {
+        "Authorization": "Bearer <insert-agent-token>",
+        "X-Coco-Org-Slug": "<org-slug>"
+      }
+    }
+  }
+}
+```
+
+Replace the URL with the connector URL from Integrations, and the placeholders with your agent token and your organization slug. Sign in when your client prompts you, or send the agent token as a bearer header directly.
+
+## Reference
+
+For the full HTTP surface behind this connector URL, see the [API Reference](/api-reference/overview). Each space also carries its own agent with a separate set of MCP tools for tasks, schedules, and run records; see [Concepts → Agents](/concepts/agents) for how those are structured.

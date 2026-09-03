@@ -1,61 +1,67 @@
 ---
 title: "Quickstart"
-description: "From zero to a queryable, agent-driven page in 15 minutes"
+description: "Set up your first shared space, connect your tools, and get an agent working"
 icon: "rocket"
 ---
 
-This guide takes you from a clean checkout to a running Coco stack — page, metadata, cross-page query, and a webhook — in under fifteen minutes.
+This walks you through the same onboarding flow you'll see in the app at [app.coconut.md](https://app.coconut.md), in order. Each step is short on its own; together they get you from an empty organization to a shared, living context layer that your agents can actually act on.
 
-## Run the stack
-
-```bash
-pnpm install
-./scripts/compose-local.sh up     # Postgres + API (8787) + app (3000), migrated + seeded
-```
-
-Open [http://localhost:3000](http://localhost:3000). The seeded identity is `demo@local` in the `demo` space.
+If you're deploying Coconut on your own infrastructure instead of using the hosted app, see the [self-hosted quickstart](/operations/quickstart).
 
 <Steps>
-  <Step title="Create a page (as an agent)">
-    ```bash
-    curl -X PUT "http://localhost:8787/pages/demo/customer-acme" \
-      -H "Authorization: Bearer dev-agent-key-change-me" \
-      -H "Content-Type: application/json" \
-      -d '{"title":"Acme Corp","content":"# Acme\n\nResearch notes...","frontmatter":{}}'
-    ```
-  </Step>
-  <Step title="Attach structured metadata">
-    ```bash
-    curl -X PATCH "http://localhost:8787/pages/demo/customer-acme/metadata" \
-      -H "Authorization: Bearer dev-agent-key-change-me" \
-      -H "Content-Type: application/json" \
-      -d '{"set":{"stage":"diligence","conviction-score":0.8},
-           "appendUnique":{"sources":["https://news.example/acme"]}}'
-    ```
-  </Step>
-  <Step title="Query across pages">
-    ```bash
-    curl -G "http://localhost:8787/search/metadata" \
-      -H "Authorization: Bearer dev-agent-key-change-me" \
-      --data-urlencode 'filters=[{"key":"stage","op":"eq","value":"diligence"},{"key":"conviction-score","op":"gte","value":0.7}]' \
-      --data-urlencode 'orderBy=conviction-score' --data-urlencode 'order=desc'
-    ```
+  <Step title="Create your first shared space (2 min)">
+    A shared space is a namespace: it groups related pages under one set of access rules, scoped to a team, a project, or a function. Start one from [Admin → Spaces](https://app.coconut.md/admin/spaces/add).
 
-    Humans run the same query in the browser at **Views** (`/views`) — filters, ordering, and a results table, shareable as a URL.
+    Name the space after the team, project, or function it belongs to rather than a generic label — that's what makes it findable later. Set visibility to org-level if everyone should be able to read it, or keep it private if it's just for your team.
   </Step>
-  <Step title="Get notified">
-    Create a webhook in **Admin → Manage webhooks** (or `POST /admin/webhooks`), and every page or metadata change POSTs a signed JSON payload to your endpoint.
+
+  <Step title="Create your first shared doc (2 min)">
+    Shared docs live inside a space, and they're the source of truth your agents pull context from. Create the [first one](https://app.coconut.md/pages/new) in the space you just made.
+
+    Keep it simple: a team charter, a project brief, or an operating note is enough to start. Pick the space that matches who should be able to read it, and don't worry about formatting — markdown is fully supported, including tables and code blocks.
+  </Step>
+
+  <Step title="Connect your desktop tool (3 min)">
+    Coconut speaks MCP, so Claude, ChatGPT, Copilot, Cursor, or any other MCP-compatible client can read and write your context directly, not just look at a page. See [Connect your tools](/connect-tools) for the walkthrough for your specific client, or open [Integrations](https://app.coconut.md/integrations) in the app to get your connector URL and config snippet.
+
+    Whichever client you use, the setup is the same shape: copy the connector URL and config, drop in an agent token, and you're connected.
+  </Step>
+
+  <Step title="Start capturing personal context (2 min)">
+    Personal context is a private workspace: notes, preferences, and working memory that sharpen every agent response without exposing anything to the rest of the org. Add your [first personal page](https://app.coconut.md/personal/new).
+
+    A "how I like to work" note or a running scratchpad is a good place to start. Personal pages stay yours; they're never shared with your organization.
+  </Step>
+
+  <Step title="Set up an agent (4 min)">
+    Every space carries an agent that uses your connected tools and context to get real work done. [Configure your first one](https://app.coconut.md/agents) and give it a goal, whether it runs inside Coconut itself or through Claude, Copilot, or ChatGPT.
+
+    Get your MCP connection working first if you haven't already, and start with a narrow, well-scoped goal. That's where agents are most reliable, and it's easy to widen the goal once you see how it behaves.
+  </Step>
+
+  <Step title="Invite your teammates (2 min, optional)">
+    Coconut is more useful once your team is in it. Copy the invite link from [Admin → Users](https://app.coconut.md/admin/users) and share it.
+
+    Teammates sign in, request access, and you approve them in a click. The invite link already carries your organization's details, so nobody needs an org ID to join, and you can manage roles and access later from the same Admin area.
   </Step>
 </Steps>
 
 ## Next steps
 
 <CardGroup cols={2}>
+  <Card title="Connect your tools" icon="plug" href="/connect-tools">
+    Step-by-step setup for Claude, ChatGPT, Copilot, Cursor, and any MCP client.
+  </Card>
+
   <Card title="Learn the model" icon="sitemap" href="/concepts/spaces-and-pages">
     Orgs, spaces, pages, and how ACLs flow through them.
   </Card>
 
   <Card title="Explore examples" icon="lightbulb" href="/examples/deal-pipeline">
     Real solutions built on the same primitives.
+  </Card>
+
+  <Card title="Self-hosting Coconut" icon="server" href="/operations/quickstart">
+    Running Coconut on your own infrastructure instead of the hosted app.
   </Card>
 </CardGroup>

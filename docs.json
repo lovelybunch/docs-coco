@@ -14,7 +14,9 @@
         "group": "Getting Started",
         "pages": [
           "index",
-          "quickstart"
+          "quickstart",
+          "connect-tools",
+          "connect-agents"
         ]
       }
     ],
@@ -33,7 +35,9 @@
         "icon": "rocket",
         "pages": [
           "index",
-          "quickstart"
+          "quickstart",
+          "connect-tools",
+          "connect-agents"
         ]
       },
       {
@@ -82,7 +86,8 @@
         "pages": [
           "operations/deployment",
           "operations/identity",
-          "operations/agents-runtime"
+          "operations/agents-runtime",
+          "operations/quickstart"
         ]
       }
     ]

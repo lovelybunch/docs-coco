@@ -1,0 +1,63 @@
+---
+title: "Self-hosted quickstart"
+description: "From zero to a queryable, agent-driven page in 15 minutes, on your own infrastructure"
+icon: "rocket"
+---
+
+This guide is for teams running Coconut on their own infrastructure. If you're using the hosted app at [app.coconut.md](https://app.coconut.md), see the [Quickstart](/quickstart) instead.
+
+It takes you from a clean checkout to a running Coconut stack — page, metadata, cross-page query, and a webhook — in under fifteen minutes.
+
+## Run the stack
+
+```bash
+pnpm install
+./scripts/compose-local.sh up     # Postgres + API (8787) + app (3000), migrated + seeded
+```
+
+Open [http://localhost:3000](http://localhost:3000). The seeded identity is `demo@local` in the `demo` space.
+
+<Steps>
+  <Step title="Create a page (as an agent)">
+    ```bash
+    curl -X PUT "http://localhost:8787/pages/demo/customer-acme" \
+      -H "Authorization: Bearer dev-agent-key-change-me" \
+      -H "Content-Type: application/json" \
+      -d '{"title":"Acme Corp","content":"# Acme\n\nResearch notes...","frontmatter":{}}'
+    ```
+  </Step>
+  <Step title="Attach structured metadata">
+    ```bash
+    curl -X PATCH "http://localhost:8787/pages/demo/customer-acme/metadata" \
+      -H "Authorization: Bearer dev-agent-key-change-me" \
+      -H "Content-Type: application/json" \
+      -d '{"set":{"stage":"diligence","conviction-score":0.8},
+           "appendUnique":{"sources":["https://news.example/acme"]}}'
+    ```
+  </Step>
+  <Step title="Query across pages">
+    ```bash
+    curl -G "http://localhost:8787/search/metadata" \
+      -H "Authorization: Bearer dev-agent-key-change-me" \
+      --data-urlencode 'filters=[{"key":"stage","op":"eq","value":"diligence"},{"key":"conviction-score","op":"gte","value":0.7}]' \
+      --data-urlencode 'orderBy=conviction-score' --data-urlencode 'order=desc'
+    ```
+
+    Humans run the same query in the browser at **Views** (`/views`) — filters, ordering, and a results table, shareable as a URL.
+  </Step>
+  <Step title="Get notified">
+    Create a webhook in **Admin → Manage webhooks** (or `POST /admin/webhooks`), and every page or metadata change POSTs a signed JSON payload to your endpoint.
+  </Step>
+</Steps>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Learn the model" icon="sitemap" href="/concepts/spaces-and-pages">
+    Orgs, spaces, pages, and how ACLs flow through them.
+  </Card>
+
+  <Card title="Explore examples" icon="lightbulb" href="/examples/deal-pipeline">
+    Real solutions built on the same primitives.
+  </Card>
+</CardGroup>
