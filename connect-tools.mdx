@@ -4,9 +4,7 @@ description: "Wire up Claude, ChatGPT, Copilot, Cursor, or any MCP client to Coc
 icon: "plug"
 ---
 
-Coconut speaks [MCP](https://modelcontextprotocol.io), so any MCP-compatible client can read and write your context directly instead of working from a static export. Every setup below has the same shape: get a connector URL from the app, drop in an agent token, and point your client at it.
-
-Your exact connector URL and a ready-made config snippet are in the app at [Integrations](https://app.coconut.md/integrations). Agent tokens are created from [Admin → Agent Keys](https://app.coconut.md/admin/agent-keys) — generate one before you start any of the flows below.
+Coconut works with the tools you already use, from Claude and ChatGPT to any client that speaks MCP.
 
 ## Claude
 
@@ -42,7 +40,7 @@ ChatGPT reaches custom MCP servers through developer mode rather than its plugin
     Enter a name and description for Coconut.
   </Step>
   <Step title="Paste the connector URL">
-    Under **Connection**, paste the connector URL from Integrations.
+    Under **Connection**, paste the connector URL from [Integrations](https://app.coconut.md/integrations) in the app.
   </Step>
   <Step title="Create and sign in">
     Create the connection, then sign in when prompted.
@@ -78,37 +76,13 @@ Copilot Studio's MCP wizard handles the OAuth handshake on its own, since the co
     Open [Customize](https://cursor.com/docs/mcp) in the sidebar, then add a custom MCP server.
   </Step>
   <Step title="Add the connector URL">
-    Use the connector URL from Integrations as a streamable HTTP server.
+    Use the connector URL from [Integrations](https://app.coconut.md/integrations) in the app as a streamable HTTP server.
   </Step>
   <Step title="Sign in">
     Sign in when Cursor prompts you to authorize.
   </Step>
 </Steps>
 
-## Any MCP client
+## Something else
 
-Any MCP-compatible client works the same way: point it at the connector URL and authenticate. A typical config file entry looks like this:
-
-```json
-{
-  "mcpServers": {
-    "coconut": {
-      "name": "coconut",
-      "enabled": true,
-      "description": "Coconut MCP server",
-      "type": "http",
-      "url": "https://api.coconut.md/mcp",
-      "headers": {
-        "Authorization": "Bearer <insert-agent-token>",
-        "X-Coco-Org-Slug": "<org-slug>"
-      }
-    }
-  }
-}
-```
-
-Replace the URL with the connector URL from Integrations, and the placeholders with your [agent token](https://app.coconut.md/admin/agent-keys) and your organization slug. Sign in when your client prompts you, or send the agent token as a bearer header directly.
-
-## Calling the API or MCP tools directly
-
-If you're scripting against Coconut instead of going through a desktop client, the [API Reference](/api-reference/overview) covers the HTTP endpoints, and [Concepts → Agents](/concepts/agents) covers what the agent-facing MCP tools can do.
+Any other MCP-compatible client connects the same way, and a custom integration or an automation runtime can use the same connector URL and agent token directly. See [Connect your agents](/connect-agents) for that setup and the full configuration reference.

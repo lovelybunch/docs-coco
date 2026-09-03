@@ -15,7 +15,8 @@
         "pages": [
           "index",
           "quickstart",
-          "connect-tools"
+          "connect-tools",
+          "connect-agents"
         ]
       }
     ],
@@ -35,7 +36,8 @@
         "pages": [
           "index",
           "quickstart",
-          "connect-tools"
+          "connect-tools",
+          "connect-agents"
         ]
       },
       {
