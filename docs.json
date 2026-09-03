@@ -14,7 +14,14 @@
         "group": "Getting Started",
         "pages": [
           "index",
-          "quickstart"
+          "quickstart",
+          "connect-tools"
+        ]
+      },
+      {
+        "group": "Operators",
+        "pages": [
+          "operators/quickstart"
         ]
       }
     ],
@@ -33,7 +40,15 @@
         "icon": "rocket",
         "pages": [
           "index",
-          "quickstart"
+          "quickstart",
+          "connect-tools"
+        ]
+      },
+      {
+        "group": "Operators",
+        "icon": "server",
+        "pages": [
+          "operators/quickstart"
         ]
       },
       {
