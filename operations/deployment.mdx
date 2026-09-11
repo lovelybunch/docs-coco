@@ -8,15 +8,15 @@ Coconut ships with three ready-made deployment paths. The enterprise artifact is
 
 <CardGroup cols={3}>
   <Card title="Docker Compose" icon="docker">
-    `./scripts/compose-local.sh` — Postgres \+ API \+ app on your laptop.
+    `./scripts/compose-local.sh` runs Postgres, the API, and the app on your laptop.
   </Card>
 
   <Card title="Kubernetes" icon="dharmachakra">
-    `./scripts/k8s-local.sh` — kind \+ Helm chart for a cluster smoke test.
+    `./scripts/k8s-local.sh` brings up kind with the Helm chart for a cluster smoke test.
   </Card>
 
   <Card title="AWS" icon="aws">
-    Terraform \+ reference architectures in `infra/`.
+    Terraform and reference architectures, published with the deployment guide.
   </Card>
 </CardGroup>
 
@@ -26,11 +26,11 @@ Coconut ships with three ready-made deployment paths. The enterprise artifact is
 pnpm db:migrate
 ```
 
-Idempotent, ordered SQL in `packages/db/drizzle/`.
+Migrations are idempotent and ordered, so re-running is safe.
 
 ## Secrets at rest
 
-Webhook secrets, connector credentials, and model keys are encrypted with `COCO_SETTINGS_ENCRYPTION_KEY` — 32 bytes, base64-encoded:
+Webhook secrets, connector credentials, and model keys are encrypted with `COCO_SETTINGS_ENCRYPTION_KEY`, which is 32 bytes, base64-encoded:
 
 ```bash
 openssl rand -base64 32

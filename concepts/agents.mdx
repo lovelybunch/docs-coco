@@ -1,10 +1,10 @@
 ---
 title: "Agents"
-description: "Every space has one agent — persona, tasks, schedules, run records"
+description: "Every space has one agent: persona, tasks, schedules, and run records"
 icon: "robot"
 ---
 
-Every space has exactly one agent — a logical identity defined by pages in its space:
+Every space has exactly one agent, a logical identity defined by pages in its space:
 
 | Page | Role |
 | --- | --- |
@@ -18,9 +18,19 @@ Schedules live in task frontmatter (`schedule`, `scheduleTz`, `scheduleEnabled`)
 
 ## Execution authority
 
-- **Scheduled runs** execute as the **space agent principal** — write access in the home space, read-only on org-visible spaces, no access to other private spaces.
+- **Scheduled runs** execute as the **space agent principal**: write access in the home space, read-only on org-visible spaces, and no access to other private spaces.
 - **Manual runs** execute with the requesting user's authority.
 
-<Tip>
-  Architecture: `specs/SPACE-AGENT-ARCHITECTURE.md`.
-</Tip>
+## Driving agents programmatically
+
+Tasks, runs, and instructions are all addressable outside the app.
+
+<CardGroup cols={2}>
+  <Card title="From a terminal" icon="terminal" href="/tools/cli">
+    `coco agent task put`, `coco agent run --watch`, and `coco agent runs`.
+  </Card>
+
+  <Card title="From code" icon="code" href="/tools/sdk#space-agents-from-code">
+    `coco.agents.createTask(...)` and `runTaskAndWait(...)`.
+  </Card>
+</CardGroup>

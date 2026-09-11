@@ -23,6 +23,11 @@
     "global": {
       "anchors": [
         {
+          "anchor": "Developers",
+          "href": "https://www.coconut.dev/developers",
+          "icon": "code"
+        },
+        {
           "anchor": "Blog",
           "href": "https://www.coconut.dev/blog",
           "icon": "newspaper"
@@ -41,11 +46,21 @@
         ]
       },
       {
+        "group": "Tools",
+        "icon": "wrench",
+        "pages": [
+          "tools/cli",
+          "tools/sdk",
+          "tools/sdk-examples"
+        ]
+      },
+      {
         "group": "Concepts",
         "icon": "book",
         "pages": [
           "concepts/spaces-and-pages",
           "concepts/page-metadata",
+          "concepts/records",
           "concepts/agents",
           "concepts/connectors",
           "concepts/templates",

@@ -1,5 +1,5 @@
 ---
-title: "Private equity — deal pipeline"
+title: "Private equity deal pipeline"
 description: "Investment memos that stay queryable"
 icon: "briefcase"
 ---
@@ -8,7 +8,14 @@ One page per target (`deals/<company>`): the body is the living investment memo;
 
 ## Building blocks
 
-- **Template** `deals/templates/deal-memo` presets the memo skeleton and `metadataDefaults: {stage: sourcing, conviction-score: 0.5}` — every new deal is born queryable.
+- **Template** `deals/templates/deal-memo` presets the memo skeleton and `metadataDefaults: {stage: sourcing, conviction-score: 0.5}`, so every new deal is born queryable.
 - A **Day.ai connector** lets the space agent fold each management call into the memo and `appendUnique` the transcript into `sources`; **Google Drive** does the same for data-room documents.
-- The **partner-meeting view**: `stage = "diligence" AND conviction-score ≥ 0.7`, ordered by `conviction-score` desc. Stale coverage: `last-reviewed < <60 days ago>`.
+- The **partner-meeting view** is one query, shareable as a URL or runnable from a terminal:
+
+  ```bash
+  coco query --space deals \
+    --filter 'stage in diligence,closing' \
+    --filter 'conviction-score>=0.7' \
+    --order-by conviction-score --desc
+  ```
 - A **webhook** on `page.metadata.updated` (space `deals`) streams stage changes into the firm's reporting warehouse.

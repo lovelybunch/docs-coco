@@ -4,7 +4,7 @@ description: "Queryable, auditable, patchable key-value state alongside every pa
 icon: "database"
 ---
 
-Structured key-value data stored **alongside** a page, not inside it. Changing a key never creates a page revision — it updates one row and writes one audit event.
+Structured key-value data stored **alongside** a page, not inside it. Changing a key never creates a page revision. It updates one row and writes one audit event.
 
 ## What you get
 
@@ -14,14 +14,14 @@ Structured key-value data stored **alongside** a page, not inside it. Changing a
   - `append` extends arrays atomically
   - `appendUnique` skips duplicates so re-run agents are idempotent
 - **Per-key audit trail**: who set what, when, with previous values.
-- **Queryable**: `eq`, `neq`, `exists`, `missing`, `gt/gte/lt/lte` (numbers and ISO-date strings), `contains` (array membership), AND-ed together, with `orderBy` ranking.
+- **Queryable**: `eq`, `neq`, `exists`, `missing`, `gt/gte/lt/lte` (numbers and ISO-date strings), `contains` (array membership), and `in` / `not-in` (the value is any, or none, of a list of candidates). Filters are AND-ed together, with `orderBy` ranking.
 - **Discoverable**: `GET /search/metadata/keys` lists the key namespace with usage counts so writers converge on existing keys.
 
 ## Patch example
 
 ```bash
-curl -X PATCH "http://localhost:8787/pages/demo/customer-acme/metadata" \
-  -H "Authorization: Bearer dev-agent-key-change-me" \
+curl -X PATCH "https://api.coconut.md/pages/demo/customer-acme/metadata" \
+  -H "Authorization: Bearer $COCO_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{"set":{"stage":"diligence","conviction-score":0.8},
        "appendUnique":{"sources":["https://news.example/acme"]}}'
@@ -30,12 +30,16 @@ curl -X PATCH "http://localhost:8787/pages/demo/customer-acme/metadata" \
 ## Query example
 
 ```bash
-curl -G "http://localhost:8787/search/metadata" \
-  -H "Authorization: Bearer dev-agent-key-change-me" \
+curl -G "https://api.coconut.md/search/metadata" \
+  -H "Authorization: Bearer $COCO_API_KEY" \
   --data-urlencode 'filters=[{"key":"stage","op":"eq","value":"diligence"},{"key":"conviction-score","op":"gte","value":0.7}]' \
   --data-urlencode 'orderBy=conviction-score' --data-urlencode 'order=desc'
 ```
 
-<Tip>
-  Full details and design rationale live in the repo at `specs/PAGE-METADATA.md`.
-</Tip>
+## Keeping keys consistent
+
+Metadata is free-form by default, which is what makes it useful to an agent that discovers a need mid-run. When a set of pages should agree on a shape, promote it to a [record type](/concepts/records): the same store, with a declared schema and validation on the way in.
+
+<Card title="Next: Record types" icon="table-list" href="/concepts/records">
+  Schemas over metadata, so a space of documents is also a queryable dataset.
+</Card>

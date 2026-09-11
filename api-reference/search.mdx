@@ -12,11 +12,27 @@ icon: "magnifying-glass"
 
 ## Metadata filter shape
 
+`filters` is a JSON array of `{key, op, value}` objects, AND-ed together. Use `orderBy` and `order=asc|desc` to rank the results.
+
 ```json
 [
-  {"key":"stage","op":"eq","value":"diligence"},
+  {"key":"stage","op":"in","value":["sourcing","diligence"]},
   {"key":"conviction-score","op":"gte","value":0.7}
 ]
 ```
 
-Supported ops: `eq`, `neq`, `exists`, `missing`, `gt`, `gte`, `lt`, `lte` (numbers and ISO-date strings), and `contains` (array membership). Filters are AND-ed together. Use `orderBy` and `order=asc|desc` to rank.
+## Supported operators
+
+| Operator | Matches when |
+| --- | --- |
+| `eq`, `neq` | the value equals, or does not equal, the given value |
+| `gt`, `gte`, `lt`, `lte` | comparison over numbers and ISO-date strings |
+| `contains` | the value is an array containing the given item |
+| `in`, `not-in` | the value is any, or none, of an array of candidates |
+| `exists`, `missing` | the key is set, or not set (`value` is omitted) |
+
+The [CLI](/tools/cli#filter-syntax) exposes the same operators as `--filter` expressions, and the [SDK](/tools/sdk#metadata-filters) as typed filter objects.
+
+## Full-text and metadata together
+
+Full-text search answers _"which pages talk about X"_. Metadata queries answer _"which pages are in state X"_. See [Search](/concepts/search) for how to combine them: full-text to find candidates, metadata to filter and rank.

@@ -6,7 +6,7 @@ icon: "rocket"
 
 This guide is for teams running Coconut on their own infrastructure. If you're using the hosted app at [app.coconut.md](https://app.coconut.md), see the [Quickstart](/quickstart) instead.
 
-It takes you from a clean checkout to a running Coconut stack — page, metadata, cross-page query, and a webhook — in under fifteen minutes.
+It takes you from a clean checkout to a running Coconut stack in under fifteen minutes, covering a page, its metadata, a cross-page query, and a webhook.
 
 ## Run the stack
 
@@ -43,7 +43,7 @@ Open [http://localhost:3000](http://localhost:3000). The seeded identity is `dem
       --data-urlencode 'orderBy=conviction-score' --data-urlencode 'order=desc'
     ```
 
-    Humans run the same query in the browser at **Views** (`/views`) — filters, ordering, and a results table, shareable as a URL.
+    Humans run the same query in the browser at **Views** (`/views`): filters, ordering, and a results table, shareable as a URL.
   </Step>
   <Step title="Get notified">
     Create a webhook in **Admin → Manage webhooks** (or `POST /admin/webhooks`), and every page or metadata change POSTs a signed JSON payload to your endpoint.

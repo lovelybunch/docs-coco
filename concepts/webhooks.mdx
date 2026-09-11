@@ -4,7 +4,7 @@ description: "Push page and metadata activity to external systems"
 icon: "webhook"
 ---
 
-Outbound webhooks push page activity to external systems — CI, data warehouses, Slack bridges, custom apps — instead of making them poll.
+Outbound webhooks push page activity to external systems such as CI, data warehouses, Slack bridges, and custom apps, instead of making them poll.
 
 ## Events
 
@@ -32,7 +32,7 @@ Deliveries are `POST`s with a JSON body:
 }
 ```
 
-Headers: `X-Coco-Event`, `X-Coco-Delivery`, `X-Coco-Webhook`, and `X-Coco-Signature` — an HMAC-SHA256 of the raw body with the webhook's signing secret, formatted `sha256=<hex>`.
+Headers: `X-Coco-Event`, `X-Coco-Delivery`, `X-Coco-Webhook`, and `X-Coco-Signature`, an HMAC-SHA256 of the raw body with the webhook's signing secret, formatted `sha256=<hex>`.
 
 ### Verifying a signature
 
@@ -45,11 +45,11 @@ Non-2xx responses and network failures retry with backoff (3 retries by default)
 
 ## Management (org admin)
 
-- `GET/POST /admin/webhooks` — list / create (`{url, events, spaceSlug?, description?}`; the signing secret is returned **once** on create)
-- `PATCH /admin/webhooks/:id` — update URL, events, space filter, enable/disable
-- `POST /admin/webhooks/:id/rotate-secret` — new secret, returned once
-- `POST /admin/webhooks/:id/test` — send a `webhook.test` delivery and report the outcome
-- `DELETE /admin/webhooks/:id`
+- `GET/POST /admin/webhooks` lists and creates subscriptions (`{url, events, spaceSlug?, description?}`; the signing secret is returned **once** on create)
+- `PATCH /admin/webhooks/:id` updates the URL, events, space filter, or enabled state
+- `POST /admin/webhooks/:id/rotate-secret` issues a new secret, returned once
+- `POST /admin/webhooks/:id/test` sends a `webhook.test` delivery and reports the outcome
+- `DELETE /admin/webhooks/:id` removes a subscription
 
 ## Security posture
 
@@ -58,4 +58,4 @@ Non-2xx responses and network failures retry with backoff (3 retries by default)
 </Warning>
 
 - Endpoints must be **https**; plain http requires the deployment to opt in with `COCO_WEBHOOKS_ALLOW_HTTP=1` (payloads then transit unencrypted).
-- **SSRF guard**: private, loopback, link-local, CGNAT, and reserved addresses (IPv4 and IPv6, including v4-mapped forms) are rejected — literals at create time, and again at **delivery time after DNS resolution**, so a hostname pointing at an internal address is blocked too (recorded in the delivery log, no retries). A small time-of-check/time-of-use window inherent to DNS remains; deployments with strict requirements should add egress filtering. `COCO_WEBHOOKS_ALLOW_PRIVATE_URLS=1` disables the guard for intentionally internal deployments.
+- **SSRF guard**: private, loopback, link-local, CGNAT, and reserved addresses (IPv4 and IPv6, including v4-mapped forms) are rejected: literals at create time, and again at **delivery time after DNS resolution**, so a hostname pointing at an internal address is blocked too (recorded in the delivery log, no retries). A small time-of-check/time-of-use window inherent to DNS remains; deployments with strict requirements should add egress filtering. `COCO_WEBHOOKS_ALLOW_PRIVATE_URLS=1` disables the guard for intentionally internal deployments.

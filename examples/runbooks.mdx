@@ -1,5 +1,5 @@
 ---
-title: "Support / SRE — runbooks"
+title: "Support and SRE runbooks"
 description: "Runbooks that know their own freshness"
 icon: "book-open"
 ---
@@ -8,10 +8,13 @@ One page per runbook (`ops/runbook-<service>`).
 
 **Metadata**: `last-tested`, `owner`, `criticality`, `linked-incidents` (appended by the agent via a **Linear/Sentry** connector).
 
-Quarterly audit view:
+The quarterly audit view:
 
-```text
-criticality = "high" AND last-tested < <90 days ago>
+```bash
+coco query --space ops \
+  --filter 'criticality in high,critical' \
+  --filter 'last-tested<"2026-06-11"' \
+  --order-by last-tested
 ```
 
 A `page.updated` webhook pings the on-call channel when a runbook changes. The metadata history answers _"who last attested this runbook."_

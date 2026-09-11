@@ -1,0 +1,190 @@
+---
+title: "SDK"
+description: "A typed TypeScript client for reading and writing your context layer from application and agent code"
+icon: "code"
+---
+
+The Coconut SDK is a TypeScript client for the Coconut Context HTTP API. It covers pages, structured metadata, search, templates and typed records, spaces, export and import, page links, and space agents. Reach for it when a script, a service, or an agent needs to read and write context in the language your stack already uses.
+
+- **Zero runtime dependencies.** Built on the platform `fetch`, so it runs on Node 20 or later, Bun, Deno, and modern browsers and workers.
+- **Faithful to the API contract.** Types are transcribed from the [OpenAPI spec](https://github.com/lovelybunch/coconut-sdk/blob/main/openapi.yaml) vendored in the repo and drift-checked nightly against the deployed contract. Admin consoles, auth flows, SCIM, and billing are intentionally out of scope.
+- **The CLI is built on it.** Everything the [Coconut CLI](/tools/cli) does goes through this client.
+
+<CardGroup cols={2}>
+  <Card title="View on npm" icon="npm" href="https://www.npmjs.com/package/coconut-sdk">
+    The `coconut-sdk` package, published under Apache-2.0.
+  </Card>
+  <Card title="Source on GitHub" icon="github" href="https://github.com/lovelybunch/coconut-sdk">
+    `lovelybunch/coconut-sdk`, including the OpenAPI spec and six runnable examples.
+  </Card>
+</CardGroup>
+
+## Install
+
+```bash
+npm install coconut-sdk
+```
+
+## Quickstart
+
+```ts
+import { CocoClient } from "coconut-sdk";
+
+const coco = new CocoClient({
+  baseUrl: "https://api.coconut.md",
+  apiKey: process.env.COCO_API_KEY, // agent key (coco_...) or OAuth access token
+  // orgSlug: "acme",               // only on multi-tenant deployments
+});
+
+// Read a page both ways
+const page = await coco.pages.get("deals/acme");             // JSON envelope
+const markdown = await coco.pages.getMarkdown("deals/acme"); // clean markdown
+
+// Create from a template (a record type), born conforming
+await coco.pages.create("deals/globex", {
+  title: "Globex",
+  template: "deal-memo",
+  metadata: { stage: "sourcing", "conviction-score": 0.4 },
+});
+
+// Patch metadata without creating a revision (idempotent appends)
+await coco.pages.patchMetadata("deals/acme", {
+  set: { stage: "diligence" },
+  appendUnique: { sources: ["https://news.example/acme"] },
+});
+
+// Query across pages: "which pages ARE in state X"
+const hot = await coco.search.metadata({
+  filters: [
+    { key: "stage", op: "in", value: ["sourcing", "diligence"] },
+    { key: "conviction-score", op: "gte", value: 0.7 },
+  ],
+  space: "deals",
+  orderBy: "conviction-score",
+  order: "desc",
+  includeMetadata: true,
+});
+
+// Update with optimistic concurrency (If-Match under the hood)
+await coco.pages.update("deals/acme", {
+  content: "# Acme\n\nUpdated memo…",
+  expectedVersion: page.version, // stale → CocoVersionConflictError (412)
+});
+
+// …or let upsert() do read → write → retry-on-conflict for you
+await coco.pages.upsert("deals/acme", { content: "# Acme\n\nLatest." });
+```
+
+Agent keys are created in the app at [Admin → Agent Keys](https://app.coconut.md/admin/agent-keys).
+
+## Surface map
+
+The client is one configured HTTP transport shared by a set of resource namespaces.
+
+| Namespace | Covers |
+| --- | --- |
+| `coco.pages` | Page reads (JSON or markdown, historical versions), create, update, upsert, revision history and restore, link graph, metadata get, patch, and history. Works for personal pages via `personal/...` paths too. |
+| `coco.personal` | The caller's private context: list, read, write, delete. |
+| `coco.spaces` | Space listings with stats, per-space pages, export and import bundles, broken-link reports. |
+| `coco.search` | Full-text search, metadata queries, key and value discovery. |
+| `coco.templates` | Page templates with normalized metadata schemas. |
+| `coco.records` | Typed-record sugar: `types(space)`, `query(space, type, …)` with an implicit template filter, and `create(space, type, …)`. |
+| `coco.spaceTemplates` | Whole-space starting kits: gallery, full bundles, create a space from a template (org admin). |
+| `coco.agents` | Space agents: rollups, model catalog, tasks with schedules, async run triggers with `waitForRun` and `runTaskAndWait`, run records and transcripts, agent instructions. |
+
+Two methods live on the client itself: `coco.health()` is an unauthenticated liveness probe, and `coco.session()` returns the resolved principal for the configured credential.
+
+## Metadata filters
+
+Metadata queries take an array of filters, AND-ed together. Each filter is `{ key, op, value }`.
+
+| Operator | Meaning |
+| --- | --- |
+| `eq`, `neq` | equals, does not equal |
+| `gt`, `gte`, `lt`, `lte` | comparison |
+| `contains` | the value contains the given string |
+| `in`, `not-in` | the value is any, or none, of an array of candidates |
+| `exists`, `missing` | the key is set, or not set (no `value`) |
+
+The `in` and `not-in` operators arrived in `coconut-sdk` 0.2.0. If you're pinned to an earlier 0.1.x range, the `MetadataFilter` type won't include them, and a 0.x caret range does not reach the next minor on its own.
+
+## Concurrency model
+
+Page writes use the API's optimistic concurrency. Updates send `If-Match: W/"<version>"`. A missing version returns **428** (`CocoPreconditionRequiredError`), and a stale one returns **412** (`CocoVersionConflictError`). Re-read and retry, or use `pages.upsert()`, which does that loop for you. The same convention applies to agent tasks and agent instructions.
+
+## Errors
+
+Every non-2xx response becomes a typed error. All of them extend `CocoApiError`, which carries `status`, `reasonCode`, `nextSteps`, and the parsed body.
+
+| Error | Status |
+| --- | --- |
+| `CocoValidationError` | 400 |
+| `CocoAuthenticationError` | 401 |
+| `CocoPaymentRequiredError` | 402 |
+| `CocoPermissionError` | 403 |
+| `CocoNotFoundError` | 404 |
+| `CocoConflictError` | 409 |
+| `CocoVersionConflictError` | 412 |
+| `CocoPreconditionRequiredError` | 428 |
+| `CocoRateLimitError` | 429, with `retryAfterSeconds` |
+| `CocoServerError` | 5xx |
+
+Transient failures (network errors, 429, 502, 503, 504) are retried with backoff on GETs only. Writes are never retried automatically.
+
+```ts
+import { CocoClient, CocoValidationError } from "coconut-sdk";
+
+try {
+  await coco.pages.patchMetadata("deals/acme", { set: { stage: "wonn" } });
+} catch (error) {
+  if (error instanceof CocoValidationError) {
+    console.log(`Rejected: ${error.status} ${error.message}`);
+  } else {
+    throw error;
+  }
+}
+```
+
+## Auth options
+
+| Option | Sends | Use |
+| --- | --- | --- |
+| `apiKey` | `Authorization: Bearer …` | Agent keys (`coco_...`) and MCP OAuth access tokens (`at_...`, scope-capped) |
+| `devUser` | `X-Coco-User` | Dev-header deployments only, never production |
+| `orgSlug` / `orgId` | `X-Coco-Org-Slug` / `X-Coco-Org-Id` | Org context on multi-tenant deployments |
+
+## Space agents from code
+
+The agents namespace lets a script hand work to the deployment's own agent instead of running a model loop itself.
+
+```ts
+await coco.agents.createTask("demo", "daily-digest", {
+  title: "Daily digest",
+  content: "Summarize what changed in this space since yesterday.",
+  frontmatter: { schedule: "0 7 * * 1-5", scheduleTz: "UTC", scheduleEnabled: true },
+});
+
+const run = await coco.agents.runTaskAndWait("demo", "daily-digest", {
+  includeTranscript: true,
+});
+console.log(run.status, run.markdown);
+```
+
+`runTaskAndWait` queues a run and polls until it reaches a terminal status. Use `runTask` and `waitForRun` separately if you want to hold the run id in between.
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="SDK examples" icon="flask" href="/tools/sdk-examples">
+    Six runnable scripts: pull, write back, visualize, chat with a space, blame, and gardener.
+  </Card>
+  <Card title="CLI" icon="terminal" href="/tools/cli">
+    The same surface from a shell, with auth flows and profiles handled for you.
+  </Card>
+  <Card title="HTTP API" icon="list" href="/api-reference/overview">
+    The routes underneath every SDK method.
+  </Card>
+  <Card title="Connect your agents" icon="plug" href="/connect-agents">
+    MCP, for clients that speak it natively instead of calling the SDK.
+  </Card>
+</CardGroup>
