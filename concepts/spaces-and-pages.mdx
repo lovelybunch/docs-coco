@@ -18,8 +18,8 @@ Writes are optimistically concurrent: updating an existing page requires `If-Mat
 
 Every space reserves two page prefixes:
 
-- `agents/` — the space agent's instructions, tasks, and run records.
-- `templates/` — page templates (see [Templates](/concepts/templates)).
+- `agents/` holds the space agent's instructions, tasks, and run records.
+- `templates/` holds page templates (see [Templates](/concepts/templates)).
 
 Both are hidden from general listings and search; address them directly to read or edit.
 

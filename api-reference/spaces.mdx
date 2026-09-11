@@ -4,12 +4,14 @@ description: "Listing, exporting, importing, and broken-link reports"
 icon: "folder"
 ---
 
+A space groups pages under one set of access rules. These routes list spaces, enumerate their pages, and move a whole space between deployments.
+
 | Method & path | Purpose |
 | --- | --- |
 | `GET /spaces` | Visible spaces |
 | `GET /spaces/:slug/pages` | Pages in a space |
 | `GET /spaces/:slug/export` | Export the space as a bundle |
-| `POST /spaces/:slug/import` | Import a bundle (\`?mode=skip | overwrite\`) |
+| `POST /spaces/:slug/import` | Import a bundle (`?mode=skip\|overwrite`) |
 | `GET /spaces/:slug/links/broken` | Broken-link report |
 | `POST /links/rebuild` | Org-admin re-index of the links graph |
 

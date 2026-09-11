@@ -1,5 +1,5 @@
 ---
-title: "Legal — contract repository"
+title: "Legal contract repository"
 description: "Plain-language summaries with auto-renewal sweeps"
 icon: "file-signature"
 ---
@@ -8,10 +8,13 @@ One page per agreement (`contracts/<counterparty>`): an agent-written plain-lang
 
 **Metadata**: `renewal-date`, `auto-renews`, `risk-score`, `counterparty`, `governing-law`, `clauses-flagged`.
 
-The GC's monthly sweep:
+The general counsel's monthly sweep:
 
-```text
-auto-renews = true AND renewal-date < <90 days out>
+```bash
+coco query --space contracts \
+  --filter auto-renews=true \
+  --filter 'renewal-date<"2026-12-10"' \
+  --order-by risk-score --desc
 ```
 
-Ordered by `risk-score` desc — with per-key history for _"who lowered this risk score, and when."_
+Per-key metadata history answers the follow-up question: _"who lowered this risk score, and when."_

@@ -1,0 +1,130 @@
+---
+title: "SDK examples"
+description: "Six runnable scripts that walk the SDK from discovery to a grounded chat agent"
+icon: "flask"
+---
+
+The [SDK repo](https://github.com/lovelybunch/coconut-sdk/tree/main/examples) ships six small scripts that walk a showcase path: discover, write back, visualize, chat, then two that lean on pages being versioned and linked: blame and gardener. They run against any Coconut Context deployment, and together they cover most of what an agent needs to do with a context layer.
+
+## Setup
+
+Clone the repo and install:
+
+```bash
+git clone https://github.com/lovelybunch/coconut-sdk.git
+cd coconut-sdk
+pnpm install
+```
+
+Point the examples at your deployment with environment variables. All of them are optional; the defaults target a local dev stack on port 8787.
+
+| Env var | Default | What it is |
+| --- | --- | --- |
+| `COCO_BASE_URL` | `http://localhost:8787` | API origin |
+| `COCO_API_KEY` | `dev-agent-key-change-me` | Bearer credential. Real deployments mint `coco_...` keys at [Admin → Agent Keys](https://app.coconut.md/admin/agent-keys) |
+| `COCO_SPACE` | `demo` | Space the examples read and write |
+| `COCO_TEMPLATE` | `deal-memo` | Record type the examples use |
+| `COCO_ORG_SLUG` | none | Org context on multi-tenant deployments |
+| `ANTHROPIC_API_KEY` | none | Example 04 only |
+| `CHAT_MODEL` | `claude-opus-5` | Example 04 only |
+| `COCO_PAGE` | `<COCO_SPACE>/deals/acme` | Example 05 only, the page to blame |
+
+Against the hosted app, that looks like:
+
+```bash
+export COCO_BASE_URL=https://api.coconut.md
+export COCO_API_KEY=coco_...
+export COCO_SPACE=demo
+```
+
+<Note>
+  Run example 02 first. It seeds the record type and records that the other five read.
+</Note>
+
+## The scripts
+
+<AccordionGroup>
+  <Accordion title="01. Pull records" icon="download">
+    ```bash
+    pnpm example:pull
+    ```
+
+    The discovery surfaces an agent uses on first contact with a deployment: spaces with stats, the org-wide metadata key namespace, each space's record types, a typed record query ordered by conviction score, and one page in both representations (JSON envelope and clean markdown) plus its link graph.
+
+    Key calls: `spaces.list`, `search.metadataKeys`, `records.types`, `records.query`, `pages.get`, `pages.getMarkdown`, `pages.links`.
+  </Accordion>
+
+  <Accordion title="02. Write back" icon="pen-to-square">
+    ```bash
+    pnpm example:write-back
+    ```
+
+    Authors a **record type** (a `deal-memo` page template with a metadata schema), creates deal records from it, then shows the write primitives: schema-validated metadata patches with `set` and idempotent `appendUnique`, optimistic-concurrency body updates, revision notes, and the per-key metadata audit trail.
+
+    The interesting moment is step 3, where a bad `stage` value is rejected with a 400 before it ever lands. Safe to re-run: the template upserts a new revision, existing records are skipped, and `appendUnique` never duplicates.
+
+    Key calls: `pages.upsert`, `records.create`, `pages.patchMetadata`, `pages.update` with `expectedVersion`, `pages.metadataHistory`.
+  </Accordion>
+
+  <Accordion title="03. Visualize" icon="chart-bar">
+    ```bash
+    pnpm example:visualize
+    ```
+
+    Pulls the deal records, renders a self-contained HTML dashboard (stat tiles, an inline SVG bar chart of deals per stage, and a table view) to `examples/out/pipeline-dashboard.html`, then writes a markdown pipeline summary **back into the space**. The summary is stamped with metadata so the report itself is queryable, and its internal links land in the link graph.
+
+    Key calls: `records.query`, `pages.upsert`, `pages.patchMetadata`.
+  </Accordion>
+
+  <Accordion title="04. Chat with a space" icon="comments">
+    ```bash
+    export ANTHROPIC_API_KEY=sk-ant-...
+    pnpm example:chat
+    ```
+
+    A terminal REPL that grounds Claude in the space. The model gets tools wrapping the SDK's read surface (list pages, read page, full-text search, list record types, query records) and answers with page-path citations. It uses the official `@anthropic-ai/sdk` with prompt caching on the space overview.
+
+    Prompts to try:
+
+    - "What's in this space?"
+    - "Which deals are in diligence with conviction ≥ 0.7, best first?"
+    - "Read the Acme memo and summarize the risks in two bullets."
+    - "Compare the sourcing-stage deals. Which one should we prioritize and why?"
+    - "What changed most recently? Anything stale?"
+    - "Draft a one-paragraph partner-meeting update from the pipeline summary."
+
+    Key calls: `spaces.pages`, `pages.getMarkdown`, `search.text`, `records.types`, `records.query`.
+  </Accordion>
+
+  <Accordion title="05. Blame" icon="clock-rotate-left">
+    ```bash
+    pnpm example:blame
+    COCO_PAGE=demo/deals/globex pnpm example:blame
+    ```
+
+    `git blame` for a memo. Replays every revision of one page oldest to newest and attributes each line of the current body to the revision that introduced it, with author, kind (human or agent), and revision note in the gutter. Then it merges the revision history with the per-key metadata audit trail into one timeline, and finishes by rolling the page back to its first revision and forward again. Both land as new revisions, so nothing is ever lost.
+
+    Re-run example 02 a couple of times first to give the memo some history.
+
+    Key calls: `pages.versions`, `pages.get` with `version`, `pages.metadataHistory`, `pages.makeLatest`.
+  </Accordion>
+
+  <Accordion title="06. Gardener" icon="seedling">
+    ```bash
+    pnpm example:gardener
+    ```
+
+    Tends the space's link graph. Plants a notes page with two dangling links, walks every page's outbound links, and reports orphans (nothing links here), hubs (most connected), and dangling links. It heals the dangling links by planting stub pages, through the matching record type when the target lives under a type's default path, so the stub is born conforming and stamped. Then it writes a **Map of content** page back into the space: a Mermaid graph of the links plus the orphan and hub report, stamped with metadata so the garden's health is queryable over time.
+
+    Re-runs find nothing to heal and refresh the map.
+
+    Key calls: `spaces.pages`, `pages.links`, `spaces.brokenLinks`, `records.types`, `records.create`, `pages.upsert`, `pages.patchMetadata`.
+  </Accordion>
+</AccordionGroup>
+
+## Where to go from here
+
+- **Space agents.** `coco.agents.createTask(...)` and `runTaskAndWait(...)` turn the chat loop inside-out: the deployment's own agent runs on a schedule and keeps pages fresh. See [Agents](/concepts/agents).
+- **Webhooks.** Point a subscription at your endpoint and every write these examples make becomes a signed event. See [Webhooks](/concepts/webhooks).
+- **Export and import.** `coco.spaces.export("demo")` snapshots everything the examples built into a portable bundle. See [Export and import](/concepts/export-import).
+- **The same path from a shell.** The [CLI](/tools/cli#a-worked-session) walks the same deal pipeline with `coco` commands.

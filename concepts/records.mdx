@@ -1,0 +1,121 @@
+---
+title: "Record types"
+description: "Pages that carry a validated schema, so a space of pages is also a queryable dataset"
+icon: "table-list"
+---
+
+A record type is a template that declares a metadata schema. Pages created from it are validated on the way in, stamped with the type's name, and queryable as rows.
+
+This is what turns a space of pages into something you can filter, rank, and trend. The page body stays a narrative a person reads. The metadata becomes structured state a query can answer, and the schema is what keeps that state consistent across everyone and everything writing to it.
+
+## Declaring a type
+
+A record type is an ordinary page under a space's `templates/` prefix whose frontmatter carries a `metadataSchema`.
+
+```yaml
+description: Investment memo starting point
+defaultPathPrefix: deals
+metadataSchema:
+  additionalKeys: allow
+  fields:
+    - key: stage
+      type: select
+      options: [sourcing, diligence, closed]
+      default: sourcing
+      required: true
+    - key: conviction-score
+      type: number
+      min: 0
+      max: 1
+      default: 0.5
+    - key: sources
+      type: list
+```
+
+| Frontmatter key | What it does |
+| --- | --- |
+| `description` | Shown in the template picker and in `GET /templates` |
+| `metadataSchema` | The field definitions. Declaring one is what makes a template a record type |
+| `metadataDefaults` | Metadata applied on create, for templates that want defaults without a full schema |
+| `defaultPathPrefix` | Where records of this type conventionally live, such as `deals` |
+
+### Field types
+
+`string`, `text`, `number`, `boolean`, `date`, `select`, `multiselect`, `list`, and `url`.
+
+Fields take `required`, `default`, `label`, and `description`. Select and multiselect fields take `options`. Number fields take inclusive `min` and `max` bounds.
+
+`additionalKeys` decides whether metadata keys the schema does not declare may be written. Set it to `allow` when agents should be free to add their own keys, or `reject` to keep the type closed.
+
+## Creating records
+
+A record is created from its type, so it is born conforming rather than corrected later. The examples below create `demo/deals/acme`: space `demo`, page path `deals/acme`.
+
+<CodeGroup>
+
+```bash CLI
+coco records create demo deal-memo deals/acme --title "Acme Corp" \
+  --metadata stage=diligence --metadata conviction-score=0.82
+```
+
+```ts SDK
+await coco.records.create("demo", "deal-memo", {
+  path: "deals/acme",
+  title: "Acme Corp",
+  metadata: { stage: "diligence", "conviction-score": 0.82 },
+});
+```
+
+```bash HTTP
+curl -X PUT "https://api.coconut.md/pages/demo/deals/acme" \
+  -H "Authorization: Bearer $COCO_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"title":"Acme Corp","template":"deal-memo",
+       "metadata":{"stage":"diligence","conviction-score":0.82}}'
+```
+
+</CodeGroup>
+
+Values are validated against the schema before anything is written. A violation returns `400` with per-field issues and creates nothing, so a bad write never leaves a half-made page behind:
+
+```bash
+coco records create demo deal-memo deals/bad --metadata stage=wonn
+# 400: stage must be one of sourcing, diligence, closed (exit code 2)
+```
+
+That guarantee is the point. Without it, a pipeline accumulates `diligence`, `Diligence`, and `in diligence` until no query is trustworthy.
+
+## Querying records
+
+Every record carries a `template` stamp in its metadata, so querying one type is a metadata query with that filter already applied.
+
+<CodeGroup>
+
+```bash CLI
+coco records list demo deal-memo \
+  --filter 'stage in sourcing,diligence' \
+  --filter 'conviction-score>=0.7' \
+  --order-by conviction-score --desc
+```
+
+```ts SDK
+const hot = await coco.records.query("demo", "deal-memo", {
+  filters: [
+    { key: "stage", op: "in", value: ["sourcing", "diligence"] },
+    { key: "conviction-score", op: "gte", value: 0.7 },
+  ],
+  orderBy: "conviction-score",
+  order: "desc",
+});
+```
+
+</CodeGroup>
+
+Discover what a space offers before you query it. `coco records types <space>` and `coco.records.types(space)` list the space's record types with their fields, which is how an agent meeting a deployment for the first time learns what it can ask.
+
+## Where record types fit
+
+- [Page metadata](/concepts/page-metadata) is the underlying store. A record type is a contract over it, not a different mechanism.
+- [Templates](/concepts/templates) covers the rest of what templates do, including whole-space kits.
+- [Views](/concepts/views) is the human window onto the same queries.
+- [Export and import](/concepts/export-import) carries a type and its records between deployments as one bundle.

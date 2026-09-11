@@ -1,0 +1,236 @@
+---
+title: "CLI"
+description: "Drive spaces, pages, metadata, records, and space agents from a terminal or a CI job with coco"
+icon: "terminal"
+---
+
+The Coconut CLI is a command-line client for the Coconut Context HTTP API. It covers pages, structured metadata, full-text search and metadata queries, typed records, templates, spaces (including export and import), and space agents. It's built on the [Coconut SDK](/tools/sdk), so every call goes through the same typed client; the CLI adds auth flows, profiles, and terminal UX on top.
+
+Use it when you want to work with your context layer from a shell, a CI pipeline, or an agent runtime that can shell out.
+
+<CardGroup cols={2}>
+  <Card title="View on npm" icon="npm" href="https://www.npmjs.com/package/coconut">
+    The `coconut` package, published under Apache-2.0.
+  </Card>
+  <Card title="Source on GitHub" icon="github" href="https://github.com/lovelybunch/coconut-cli">
+    `lovelybunch/coconut-cli`, including tests and the release workflow.
+  </Card>
+</CardGroup>
+
+## Install
+
+Requires Node 20 or later.
+
+```bash
+npm install -g coconut
+coco --help
+```
+
+The package installs one binary under two names, `coco` and `coconut`. The docs use `coco` throughout.
+
+## Authenticate
+
+Credentials are stored in named **profiles** in `~/.config/coco/config.json` (`XDG_CONFIG_HOME` is respected, and the file is written with mode `0600`). There are two credential types.
+
+<Tabs>
+  <Tab title="Browser sign-in (people)">
+    ```bash
+    coco auth login --base-url https://api.coconut.md
+    ```
+
+    This discovers the OAuth endpoints, registers a client with a loopback redirect, opens your browser at the sign-in page, and exchanges the code (PKCE S256 plus `state`). The browser step needs a signed-in human, so this is the interactive path.
+
+    Scopes default to `context:read context:write`. Pass `--read-only` for a `context:read`-only token; writes are then denied with a 403 regardless of your role. Access tokens refresh automatically. When a refresh fails, you get a clear message asking you to run `coco auth login` again (exit code 4).
+
+    The OAuth flow refuses to proceed unless the discovery document's issuer matches the base URL and every endpoint is on that same origin. Endpoints must be `https`; plain `http` is allowed only for loopback hosts.
+  </Tab>
+  <Tab title="Agent key (CI, scripts, agents)">
+    ```bash
+    coco auth login --key                    # prompts with echo off
+    echo "$COCO_KEY" | coco auth login --key # from stdin, for scripts
+    ```
+
+    Agent keys look like `coco_...` and are created in the app at [Admin → Agent Keys](https://app.coconut.md/admin/agent-keys). The secret is never accepted as a command-line argument, only via prompt or stdin.
+  </Tab>
+</Tabs>
+
+Check what you're signed in as:
+
+```bash
+coco auth status   # server health plus who or what the credential is
+coco whoami        # just the principal
+coco auth logout   # remove the credential, keep the profile
+```
+
+### Profiles, flags, and environment
+
+```bash
+coco profile list
+coco profile use <name>
+coco profile remove <name>
+```
+
+Every command accepts `--profile`, `--base-url`, `--org-slug`, `--json`, and `--quiet`. Precedence is **flags, then environment, then profile**. The environment variables are `COCO_BASE_URL`, `COCO_API_KEY`, and `COCO_ORG_SLUG`, so a CI job needs no config file at all:
+
+```bash
+COCO_BASE_URL=https://api.coconut.md COCO_API_KEY=$KEY coco spaces list
+```
+
+## Command surface
+
+```text
+coco spaces   list [--stats] · pages <space> · export <space> [-o f]
+              import <space> <bundle.json> [--overwrite] · broken-links <space>
+coco page     get <space/path> [--json|--md] [--version N]
+              put <space/path> [-f|--file file|-] [--title] [--template] [--metadata k=v…]
+                  [--frontmatter json] [--note]
+              edit <space/path>            ($EDITOR round-trip, If-Match)
+              versions · restore <v> · links · delete (personal/… only)
+coco meta     get | patch [--set k=v… --append k=v… --append-unique k=v…] | history
+coco search   <query> [--space] [--limit]
+coco query    --filter k=v --filter 'score>=0.7' [--space] [--order-by k --desc]
+coco records  types <space> · list <space> <type> [--filter…] [--order-by k --desc]
+              create <space> <type> <path>
+coco templates list [--space]
+coco space-templates list | show <source> <id> | create-space <source> <id> --slug s
+coco agent    list · tasks <space> · task get|put <space> <task> · run <space> <task> [--watch]
+              runs <space> <task> · run-show <space> <run-id> [--transcript]
+              instructions get|set <space> · models
+coco personal list | get | put | delete <path>
+coco whoami · coco health
+```
+
+Run `coco <command> --help` for the full option list of any command.
+
+## Filter syntax
+
+`coco query` and `coco records list` take repeatable `--filter` expressions. Filters are AND-ed together.
+
+| Expression | Matches when |
+| --- | --- |
+| `k=v` | the key equals `v` |
+| `k!=v` | the key does not equal `v` |
+| `k>v`, `k>=v`, `k<v`, `k<=v` | numeric or string comparison |
+| `k~v` | the value is an array containing `v` |
+| `k in a,b` | the value is any of the listed candidates |
+| `k not-in a,b` | the value is none of the listed candidates, and the key exists |
+| `k:exists` | the key is set |
+| `k:missing` | the key is not set |
+
+Values are JSON-parsed when they look like JSON: `0.7` is a number, `"0.7"` is a string, `true` is a boolean. The same rule applies to `--metadata` and `--set` values, and `--set k=null` deletes a key.
+
+The list operators `in` and `not-in` take a comma-separated list or a JSON array literal. Each item is JSON-parsed like any other filter value.
+
+```bash
+coco query --filter 'stage in sourcing,diligence' --space deals
+coco query --filter 'stage not-in closed,lost' --space deals
+coco query --filter 'score in [1,2]' --space deals
+```
+
+The list operators shipped in `coconut` 0.2.0. Run `coco --version` if a filter using them is rejected as a usage error.
+
+A few details worth knowing:
+
+- `in` and `not-in` are whitespace-delimited word operators, and the earliest operator in the expression wins. `note=check in later` is still an equality check on the string `check in later`, and a key literally named `in` still works.
+- A single JSON scalar is one candidate, so `note in "a,b"` keeps the comma.
+- An empty list or an empty item is a usage error (exit code 2).
+
+## Safe writes
+
+Writes are safe by construction. `page put` and `page edit` read the current version and send `If-Match`, so a concurrent edit surfaces as a clear 412 conflict message (exit code 6) instead of a silent overwrite.
+
+A leading `---` block of flat `key: value` lines in content you provide is folded into the title and frontmatter client-side; the REST API stores content verbatim. For nested structures, use `--frontmatter` with one-line JSON.
+
+## Output and exit codes
+
+Human-readable tables print by default. `--json` prints the raw API payload alone on stdout, so you can pipe it to `jq`. Informational chatter goes to stderr, and `--quiet` silences it. `NO_COLOR` is respected.
+
+| Exit | Meaning |
+| --- | --- |
+| 0 | success |
+| 1 | unexpected error, including a watched agent run that failed |
+| 2 | usage error or invalid input (CLI args or API 400 validation) |
+| 3 | could not reach the server |
+| 4 | authentication failed (401, no credential, or token refresh failed) |
+| 5 | not found (404) |
+| 6 | conflict: 409, 412 concurrent edit, or 428 missing precondition |
+| 7 | permission denied (403; `reasonCode` and `nextSteps` are printed) |
+| 8 | rate limited (429) |
+| 9 | server error (5xx, or feature unavailable in this runtime) |
+
+## A worked session
+
+This walks the same deal-pipeline shape used in the [SDK examples](/tools/sdk-examples): author a record type, create records from it, query and patch them, move the space, then hand work to the space agent.
+
+<Steps>
+  <Step title="Sign in">
+    The headless path is shown here. Use `coco auth login` for the browser flow.
+
+    ```bash
+    echo "$COCO_KEY" | coco auth login --key --base-url https://api.coconut.md
+    coco auth status
+    ```
+  </Step>
+  <Step title="Author a record type">
+    A record type is a template with a metadata schema. Records created from it are validated against that schema.
+
+    ```bash
+    coco page put demo/templates/deal-memo --title "Deal memo" \
+      --frontmatter '{"description":"Investment memo","defaultPathPrefix":"deals",
+        "metadataSchema":{"fields":[
+          {"key":"stage","type":"select","options":["sourcing","diligence","closed"],"default":"sourcing","required":true},
+          {"key":"conviction-score","type":"number","min":0,"max":1,"default":0.5},
+          {"key":"sources","type":"list"}]}}' \
+      --file memo-skeleton.md
+    ```
+  </Step>
+  <Step title="Create records">
+    Records are born conforming. A value outside the schema is rejected with a 400 and exit code 2.
+
+    ```bash
+    coco records create demo deal-memo deals/acme --title "Acme Corp" \
+      --metadata stage=diligence --metadata conviction-score=0.82
+    coco records create demo deal-memo deals/bad --metadata stage=wonn   # 400, exit 2
+    ```
+  </Step>
+  <Step title="Work the pipeline">
+    ```bash
+    coco query --filter 'stage in sourcing,diligence' --filter 'conviction-score>=0.7' \
+      --space demo --order-by conviction-score --desc
+    coco meta patch demo/deals/acme --set stage=closed \
+      --append-unique sources=https://news.example/acme
+    coco page edit demo/deals/acme          # opens $EDITOR, saves with If-Match
+    coco page versions demo/deals/acme
+    ```
+  </Step>
+  <Step title="Move a space around">
+    ```bash
+    coco spaces export demo -o demo.json
+    coco spaces import demo-staging demo.json --overwrite
+    ```
+  </Step>
+  <Step title="Ask the space agent to work">
+    ```bash
+    coco agent task put demo daily-digest --title "Daily digest" \
+      --schedule "0 7 * * 1-5" --tz UTC --enable --file digest-task.md
+    coco agent run demo daily-digest --watch
+    ```
+  </Step>
+</Steps>
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="SDK" icon="code" href="/tools/sdk">
+    The typed TypeScript client the CLI is built on, for when a script needs more than the CLI gives you.
+  </Card>
+  <Card title="HTTP API" icon="list" href="/api-reference/overview">
+    The routes underneath every CLI command.
+  </Card>
+  <Card title="Page metadata" icon="tags" href="/concepts/page-metadata">
+    How keys, schemas, and the audit trail behind `coco meta` work.
+  </Card>
+  <Card title="Agents" icon="robot" href="/concepts/agents">
+    Tasks, schedules, and run records behind `coco agent`.
+  </Card>
+</CardGroup>
