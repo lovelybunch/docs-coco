@@ -102,8 +102,8 @@ Metadata queries take an array of filters, AND-ed together. Each filter is `{ ke
 | --- | --- |
 | `eq`, `neq` | equals, does not equal |
 | `gt`, `gte`, `lt`, `lte` | comparison |
-| `contains` | the value contains the given string |
-| `in`, `not-in` | the value is any, or none, of an array of candidates |
+| `contains` | the value is an array containing the given item |
+| `in`, `not-in` | the value is any, or none, of an array of candidates. `not-in` requires the key to exist, like `neq` |
 | `exists`, `missing` | the key is set, or not set (no `value`) |
 
 The `in` and `not-in` operators arrived in `coconut-sdk` 0.2.0. If you're pinned to an earlier 0.1.x range, the `MetadataFilter` type won't include them, and a 0.x caret range does not reach the next minor on its own.

@@ -4,6 +4,8 @@ description: "CRUD, versions, metadata, and links"
 icon: "file-lines"
 ---
 
+Pages are the unit of content. These routes read and write them, walk their revision history, and reach their metadata and links.
+
 | Method & path | Purpose |
 | --- | --- |
 | `GET /pages/:space/:path` | Read a page (HTML; `.md` or `Accept: text/markdown` for markdown; `?version=n` for history) |

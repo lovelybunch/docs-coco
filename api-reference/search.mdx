@@ -4,11 +4,14 @@ description: "Full-text and metadata endpoints"
 icon: "magnifying-glass"
 ---
 
+Two ways to find pages: full-text search over their content, and metadata queries over their structured state.
+
 | Method & path | Purpose |
 | --- | --- |
 | `GET /search?q=` | Full-text search |
 | `GET /search/metadata?filters=` | Metadata query |
 | `GET /search/metadata/keys` | Metadata key discovery |
+| `GET /search/metadata/values` | Metadata value discovery for one key |
 
 ## Metadata filter shape
 
@@ -28,7 +31,7 @@ icon: "magnifying-glass"
 | `eq`, `neq` | the value equals, or does not equal, the given value |
 | `gt`, `gte`, `lt`, `lte` | comparison over numbers and ISO-date strings |
 | `contains` | the value is an array containing the given item |
-| `in`, `not-in` | the value is any, or none, of an array of candidates |
+| `in`, `not-in` | the value is any, or none, of an array of candidates. `not-in` requires the key to exist, like `neq` |
 | `exists`, `missing` | the key is set, or not set (`value` is omitted) |
 
 The [CLI](/tools/cli#filter-syntax) exposes the same operators as `--filter` expressions, and the [SDK](/tools/sdk#metadata-filters) as typed filter objects.

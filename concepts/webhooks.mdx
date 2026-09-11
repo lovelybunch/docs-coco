@@ -10,7 +10,7 @@ Outbound webhooks push page activity to external systems such as CI, data wareho
 
 | Event | Fires when |
 | --- | --- |
-| `page.created` | A page's first revision is written (any door: HTTP, MCP, import) |
+| `page.created` | A page's first revision is written, through any interface: HTTP, MCP, or import |
 | `page.updated` | A new revision of an existing page is written |
 | `page.deleted` | A page is deleted (admin or personal deletion) |
 | `page.metadata.updated` | A metadata patch lands (payload lists `changedKeys`) |

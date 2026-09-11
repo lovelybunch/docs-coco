@@ -4,12 +4,14 @@ description: "OIDC providers and lifecycle sync"
 icon: "id-card"
 ---
 
-- **Google Workspace OIDC** is first-class.
-- **Okta** profile available.
-- **SCIM** baseline for user lifecycle sync.
+Coconut authenticates people through your OIDC provider and syncs their lifecycle through SCIM. Reach for this page when you are wiring a deployment to your identity provider.
+
+- **Google Workspace OIDC** is the best-supported path.
+- An **Okta** profile is available.
+- **SCIM** covers user lifecycle sync: provisioning, updates, and deprovisioning.
 
 The identity and SCIM setup runbook ships with your deployment. Contact [support](mailto:support@coconut.dev) if you need a copy for a provider not listed above.
 
 ## Principals
 
-Humans (OIDC) and agents (API keys / OAuth tokens) are evaluated by the same ACL engine. See [Ownership & access control](/concepts/access-control).
+Humans (OIDC) and agents (agent keys / OAuth tokens) are evaluated by the same ACL engine. See [Ownership & access control](/concepts/access-control).

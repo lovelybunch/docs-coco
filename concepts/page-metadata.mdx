@@ -14,8 +14,8 @@ Structured key-value data stored **alongside** a page, not inside it. Changing a
   - `append` extends arrays atomically
   - `appendUnique` skips duplicates so re-run agents are idempotent
 - **Per-key audit trail**: who set what, when, with previous values.
-- **Queryable**: `eq`, `neq`, `exists`, `missing`, `gt/gte/lt/lte` (numbers and ISO-date strings), `contains` (array membership), and `in` / `not-in` (the value is any, or none, of a list of candidates). Filters are AND-ed together, with `orderBy` ranking.
-- **Discoverable**: `GET /search/metadata/keys` lists the key namespace with usage counts so writers converge on existing keys.
+- **Queryable**: `eq`, `neq`, `exists`, `missing`, `gt/gte/lt/lte` (numbers and ISO-date strings), `contains` (array containment), and `in` / `not-in` (the value is any, or none, of a list of candidates). Filters are AND-ed together, with `orderBy` ranking.
+- **Discoverable**: `GET /search/metadata/keys` lists the key namespace with usage counts so writers converge on existing keys, and `GET /search/metadata/values` lists the values in use for one key.
 
 ## Patch example
 
@@ -41,5 +41,5 @@ curl -G "https://api.coconut.md/search/metadata" \
 Metadata is free-form by default, which is what makes it useful to an agent that discovers a need mid-run. When a set of pages should agree on a shape, promote it to a [record type](/concepts/records): the same store, with a declared schema and validation on the way in.
 
 <Card title="Next: Record types" icon="table-list" href="/concepts/records">
-  Schemas over metadata, so a space of documents is also a queryable dataset.
+  Schemas over metadata, so a space of pages is also a queryable dataset.
 </Card>

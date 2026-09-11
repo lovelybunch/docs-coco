@@ -66,4 +66,4 @@ Docs are reference writing, not blog writing. The voice guide's blog skeleton (o
 - CLI: [`lovelybunch/coconut-cli`](https://github.com/lovelybunch/coconut-cli) (npm `coconut`, binaries `coco` and `coconut`)
 - SDK: [`lovelybunch/coconut-sdk`](https://github.com/lovelybunch/coconut-sdk) (npm `coconut-sdk`), whose `openapi.yaml` is the source of truth for the REST contract
 
-Metadata filter operators are documented in five places and must agree: `/concepts/page-metadata`, `/concepts/records`, `/api-reference/search`, `/tools/cli`, and `/tools/sdk`.
+Metadata filter operators must agree wherever they appear. Today that is `/concepts/page-metadata`, `/api-reference/search`, `/tools/cli`, and `/tools/sdk`. Grep for an existing operator name before adding one, and update every hit. `contains` is array containment, not substring matching.

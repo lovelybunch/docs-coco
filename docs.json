@@ -9,17 +9,6 @@
   },
   "favicon": "/favicon.svg",
   "navigation": {
-    "pages": [
-      {
-        "group": "Getting Started",
-        "pages": [
-          "index",
-          "quickstart",
-          "connect-tools",
-          "connect-agents"
-        ]
-      }
-    ],
     "global": {
       "anchors": [
         {

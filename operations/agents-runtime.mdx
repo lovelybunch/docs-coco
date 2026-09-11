@@ -4,12 +4,14 @@ description: "Native mode and the Eve runtime container"
 icon: "microchip"
 ---
 
-Enable native agents:
+Space agents need somewhere to execute. Native mode runs them inside your own deployment, in a runtime container alongside the API, rather than delegating to an external client.
+
+Enable it on the API:
 
 ```bash
 COCO_NATIVE_AGENTS_MODE=native
 ```
 
-Run the **Eve runtime container** alongside the API. Per-org entitlements gate multi-tenant rollout.
+Then run the agents runtime container alongside the API. On multi-tenant deployments, per-org entitlements control which organizations can use it.
 
 See [Agents](/concepts/agents) for how tasks, schedules, and run records are structured, and [Connectors](/concepts/connectors) for how a running agent reaches external systems.
