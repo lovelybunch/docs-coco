@@ -1,0 +1,307 @@
+---
+title: "Prompt gallery"
+description: "Prompts to try once your connector is live, grouped by the job you are doing"
+icon: "comments"
+---
+
+Connecting Coconut takes a few minutes. Knowing what to type next takes longer, because a fresh connector gives your client 33 new tools and no hint about which ones matter.
+
+This page is a gallery of prompts that cover that whole surface, grouped by job and ordered from simple to advanced inside each group. Start at the top of a section, work down as far as you need, and stop when you have what you came for.
+
+<Note>
+  Every prompt here assumes the connector is already connected and authorized. If it isn't yet, start at [Connect your tools](/connect-tools) for Claude, ChatGPT, Copilot, and Cursor, or [Connect your agents](/connect-agents) for anything else.
+</Note>
+
+## How to read this page
+
+Prompts are written the way you would actually type them, in a normal sentence, with no special syntax. Swap the space slugs, page paths, and metadata keys for your own.
+
+The second column names the tools the client should reach for. You never type those. They are there so you can check your client picked the right ones, which is the fastest way to tell a bad prompt from a bad setup.
+
+## Find your bearings
+
+Do this first. Most disappointing first sessions are a client guessing at a space that doesn't exist.
+
+| Prompt | Tools |
+| --- | --- |
+| "Who am I connected as, and what can I read and write?" | `context_whoami` |
+| "List my spaces and tell me what each one seems to be for." | `context_space_list` |
+| "What's in the `sales` space? Group the pages by their top-level path so I can see how it's organized." | `context_list_shared_pages` |
+| "What changed in the last week across all my spaces?" | `context_recent_shared_pages` |
+| "Search my context for anything about the pricing change and tell me which page is the most authoritative." | `context_search_shared_pages` |
+| "Read `engineering/runbooks/deploy` and summarize it in five bullets." | `context_get_shared_page` |
+| "Here's a link a colleague sent me. Read it and tell me what I need to know before the call." | `get_context_by_url` |
+| "What metadata keys are actually in use in `sales`, and how many pages carry each one?" | `context_list_metadata_keys` |
+
+<Tip>
+  Search returns snippets, not whole pages. When an answer matters, ask your client to open the page it found and read it in full before relying on it.
+</Tip>
+
+## Create a space
+
+A space groups pages around a purpose and carries its own members, visibility, and agent.
+
+| Prompt | Tools |
+| --- | --- |
+| "Create a private space called `research` for competitive work." | `context_create_space` |
+| "Create an org-visible space `onboarding` described as where new hires find their first week, then show me the empty space." | `context_create_space`, `context_space_list` |
+
+Visibility is `private` or `org`, and it is worth being deliberate: `org` means every member can read it. Say which one you want in the prompt, or your client will pick the default for you.
+
+## Create and edit pages
+
+| Prompt | Tools |
+| --- | --- |
+| "Create a page in `research` at `competitors/northwind` with what you know about them so far, and flag what you're unsure about." | `context_create_shared_page` |
+| "Read `research/competitors/northwind`, add a pricing section from this transcript, and save it with a note saying where the pricing came from." | `context_get_shared_page`, `context_update_shared_page` |
+| "Who changed `playbooks/onboarding` recently, and what did each revision actually change?" | `context_get_shared_page_revisions` |
+| "The page at `research/scratch/old-test` was a test. Delete it." | `context_delete_shared_page` |
+
+<Tip>
+  Ask for a change note on every write. `context_update_shared_page` records one per revision, and a month later the difference between a legible history and an unreadable one is entirely whether anyone bothered.
+</Tip>
+
+### Group pages under a path
+
+Page paths nest. A page is addressed as `spaceSlug/pagePath`, and the page path can be as deep as you want: `research/competitors/northwind`, `sales/accounts/2026/acme`. There are no folders to create first. Writing a page at a nested path is what brings the grouping into existence.
+
+That makes path structure something you can ask for directly, and something you can change later.
+
+| Prompt | Tools |
+| --- | --- |
+| "Create a page for each of these five competitors under `research/competitors/`, one page each, named from the company name." | `context_create_shared_page` |
+| "Everything in `research` is sitting at the top level. Propose a path structure that groups it by type, show me the before and after list, and don't move anything until I say go." | `context_list_shared_pages` |
+| "Now do it: recreate each page at its new path with the same content, then delete the old ones." | `context_get_shared_page`, `context_create_shared_page`, `context_delete_shared_page` |
+
+<Note>
+  Two prefixes are reserved in every space. `agents/` holds the space agent's instructions, tasks, and run records, and `templates/` holds page templates. Both are hidden from ordinary listings and search, so ask for them by name when you want them.
+</Note>
+
+## Page metadata
+
+Metadata is structured key-value data stored alongside a page. The body stays a narrative a person reads. The metadata is state a query can answer.
+
+| Prompt | Tools |
+| --- | --- |
+| "Set `stage` to `diligence` and `owner` to me on `sales/accounts/acme`." | `context_set_page_metadata` |
+| "Show me the metadata on `sales/accounts/acme`, including how it has changed over time." | `context_get_page_metadata` |
+| "Add this URL to the `sources` list on `research/competitors/northwind` without duplicating it if it's already there." | `context_set_page_metadata` with `appendUnique` |
+| "Find every page in `sales` where `stage` is `diligence` and `deal-size` is over 50000." | `context_query_pages_by_metadata` |
+| "Which accounts are in sourcing or diligence, ranked by `conviction-score`, highest first? Top ten." | `context_query_pages_by_metadata` with `in` and `orderBy` |
+| "Find pages in `sales` that have an `owner` but no `last-reviewed` date, and list them oldest first." | `context_query_pages_by_metadata` with `exists` and `missing` |
+
+Filters combine with AND and support `eq`, `neq`, `exists`, `missing`, `gt`, `gte`, `lt`, `lte`, `contains`, `in`, and `not-in`. `contains` is array containment, not substring matching, so it answers "does this page's `sources` list include that URL" rather than "does this text appear anywhere".
+
+<Tip>
+  Before your client writes a new key, have it check the ones already in use: "list the metadata keys in `sales` and tell me if `confidence` is already covered by an existing key." This is the single highest-value habit on this page. It is what stops a space accumulating `owner`, `Owner`, and `owned-by` until no query is trustworthy.
+</Tip>
+
+## Templates and record types
+
+This is the part people find fiddly, so it gets the most room.
+
+A **template** is an ordinary page under a space's `templates/` prefix. What makes it a template is its frontmatter. A template that also declares a `metadataSchema` becomes a **record type**: pages created from it are validated on the way in, stamped with the type's name, and queryable as rows.
+
+The payoff is that a space of pages is also a dataset. The cost is about ten minutes of setup. These prompts are that ten minutes.
+
+### See what a space already gives you
+
+Always start here. Creating a page that ignores the type its space already has is the most common way to end up with data that won't query.
+
+| Prompt | Tools |
+| --- | --- |
+| "What record types does `sales` have? For each one, show me its fields, which are required, and where its pages are meant to live." | `context_space_templates` |
+| "Show me every record type across all my spaces so I can see what's already been modeled." | `context_space_templates` with no space filter |
+| "Show me the `deal-memo` template's body too, so I can see the content scaffold a new record starts from." | `context_space_templates` with `includeContent` |
+
+Each type reports a `defaultPathPrefix`, the directory where its records conventionally live. A `deal-memo` with prefix `deals` means new records belong at `deals/<slug>`. Tell your client to honor it, or tell it not to, but decide on purpose.
+
+### Create a record from a type
+
+| Prompt | Tools |
+| --- | --- |
+| "Create a new deal record for Acme in `sales` using the `deal-memo` type. Stage is diligence, conviction 0.82. Put it where that type says records go." | `context_space_templates`, `context_create_shared_page` with `template` |
+| "Read this call transcript, then create a `prospect` record in `sales` filling in every schema field you can support from the transcript. Leave anything you'd have to guess at empty and tell me which ones those were." | `context_space_templates`, `context_create_shared_page` |
+| "Create prospect records for all six companies in this list, and give me a table at the end of what you created and what each one is missing." | `context_space_templates`, `context_create_shared_page` |
+
+Validation happens before anything is written. A bad value fails the call and creates nothing, so a rejected write never leaves a half-made page behind. When your client reports a validation error, that is the guardrail working.
+
+### Declare a record type
+
+There is no separate schema tool. A record type is declared by writing `metadataSchema` into a template page's frontmatter, which means `context_update_shared_page` is how you create and change one.
+
+| Prompt | Tools |
+| --- | --- |
+| "Create a record type in `research` called `competitor`. Fields: `tier` as a select of tier-1, tier-2, watch, required; `last-reviewed` as a date; `sources` as a list; `threat-score` as a number from 0 to 1. Records live under `competitors`." | `context_update_shared_page` writing `frontmatter.metadataSchema` |
+| "Look at the twenty pages under `sales/accounts/` and propose a record type from what they have in common. Show me the schema before you write it." | `context_list_shared_pages`, `context_get_page_metadata` |
+| "Add an `owner` field to the `competitor` type, make `last-reviewed` required, and tell me how many existing records would now fail validation." | `context_space_templates`, `context_update_shared_page`, `context_query_pages_by_metadata` |
+| "Close the `competitor` type so agents can't invent their own keys on it." | `context_update_shared_page` setting `additionalKeys: reject` |
+
+Field types are `string`, `text`, `number`, `boolean`, `date`, `select`, `multiselect`, `list`, and `url`. Fields take `required`, `default`, `label`, and `description`. Select and multiselect take `options`, and number fields take `min` and `max`.
+
+`additionalKeys` decides whether keys the schema doesn't declare may be written. Use `allow` when you want agents to be free to add their own, and `reject` to keep the type closed.
+
+### Query records like rows
+
+Every record carries a `template` stamp, so querying one type is a metadata query with that filter already applied.
+
+| Prompt | Tools |
+| --- | --- |
+| "List every `competitor` record in tier-1, ranked by `threat-score`." | `context_query_pages_by_metadata` |
+| "Which `competitor` records haven't been reviewed since January? Give me a table with tier, owner, and last reviewed date." | `context_query_pages_by_metadata` with `lt` on an ISO date |
+| "Across `sales`, compare how many deals are in each stage, then read the three highest-conviction diligence memos and tell me what they have in common." | `context_query_pages_by_metadata`, `context_get_shared_page` |
+
+### Fix a type that drifted
+
+| Prompt | Tools |
+| --- | --- |
+| "Find every page in `sales` created from `deal-memo` that's missing a required field, and list what each one needs." | `context_space_templates`, `context_query_pages_by_metadata` |
+| "The `stage` values in `sales` have drifted. Show me every distinct value in use with a count, and flag the ones that are the same stage spelled differently." | `context_list_metadata_keys`, `context_query_pages_by_metadata` |
+| "Normalize those to the schema's options. Show me the mapping first, then apply it once I approve." | `context_query_pages_by_metadata`, `context_set_page_metadata` |
+| "Twelve pages under `sales/accounts/` predate the `deal-memo` type. Backfill their metadata to conform, leaving the page bodies untouched, and tell me which ones you couldn't fill confidently." | `context_get_shared_page`, `context_set_page_metadata` |
+
+## Follow the links between pages
+
+Internal links are indexed automatically on every write, in both directions.
+
+| Prompt | Tools |
+| --- | --- |
+| "What links to `playbooks/pricing`? I want to know what breaks if I rewrite it." | `context_get_page_links` |
+| "Check `engineering/runbooks/deploy` for broken internal links and fix the ones where the target obviously moved." | `context_get_page_links`, `context_update_shared_page` |
+| "Find the pages in `research` that nothing links to, and tell me which ones look orphaned rather than just standalone." | `context_list_shared_pages`, `context_get_page_links` |
+
+## Personal context
+
+Your personal space is private. Nobody else in the org can read it, and it is the right home for working notes, preferences, and anything not ready to be shared.
+
+| Prompt | Tools |
+| --- | --- |
+| "Create a personal page at `notes/how-i-work` with my working preferences, and ask me anything you need to fill it in properly." | `context_create_personal_page` |
+| "What's in my personal space?" | `context_list_personal_pages` |
+| "Read my `notes/how-i-work` page and use it to shape how you draft for the rest of this session." | `context_get_personal_page` |
+| "Append today's decisions to my running `notes/decisions` page under a dated heading." | `context_get_personal_page`, `context_update_personal_page` |
+| "Take my personal page on account strategy, strip the half-formed bits and anything about individuals, and publish what's left to `sales/playbooks/strategy`." | `context_get_personal_page`, `context_create_shared_page` |
+
+## Space agents
+
+<Note>
+  **Some setup happens outside these prompts.** Space agents reach Slack, Google Drive, Linear, HubSpot, and the rest through [connectors](/concepts/connectors), and no MCP tool creates or authorizes one. Connectors are added and granted in the app, on the space's **Connections** page. Any prompt below that pulls from an external system needs that done first. The agent prompts that only touch Coconut pages work straight away.
+</Note>
+
+These are Coconut's own agents, not the client you are typing into. The distinction matters:
+
+| | Your MCP client | A space agent |
+| --- | --- | --- |
+| Where it runs | On your machine, in your session | Inside the space, on Coconut's runtime |
+| When it runs | When you prompt it | On demand, or on a schedule, with nobody watching |
+| What it can reach | Whatever you have connected | The space's pages and the space's connectors |
+| What it leaves behind | A chat log | A run record on a page, with status, output, and token usage |
+
+Every space has exactly one agent, defined entirely by pages in its space: `agents/instructions` is its persona, `agents/<task>` is a task, and `agents/runs/<task>/<run-id>` is a run record. There is nothing else to provision. If you can write a page, you can build an agent.
+
+Because they run unattended and inside one space, they are best at the work nobody volunteers for: keeping a space tidy, and pulling the outside world in.
+
+### Meet the agent
+
+| Prompt | Tools |
+| --- | --- |
+| "What agents do I have, and which are actually being used? Flag any space with tasks but no runs, or with instructions still unset." | `agent_list` |
+| "What are the `sales` agent's instructions right now?" | `agent_get_instructions` |
+| "Show me every task in `sales` with its schedule and last run status. Which schedules are paused?" | `agent_list_tasks` |
+| "Which models can agent tasks use here, and what's the org default?" | `agent_list_available_models` |
+
+### Give it a persona
+
+| Prompt | Tools |
+| --- | --- |
+| "Give the `sales` agent a persona: terse, exec-facing, always cite the page it drew from, never speculate about numbers it can't source. Set it as the instructions." | `agent_set_instructions` |
+| "Compare the personas across all my agents. Are they consistent about citation and tone?" | `agent_list`, `agent_get_instructions` |
+
+### Write a task and run it
+
+| Prompt | Tools |
+| --- | --- |
+| "Create a task in `sales` called `deal-brief` that reads every diligence-stage deal and writes a one-page summary of what moved this week." | `agent_create_task` |
+| "Turn the runbook at `engineering/runbooks/deploy` into a task that checks the deploy each morning and reports anything unexpected." | `context_get_shared_page`, `agent_create_task` |
+| "Run `deal-brief` now and tell me how it went: status, duration, tokens." | `agent_run_task` |
+| "Run `deal-brief`, and if it fails, read the run record and tell me why." | `agent_run_task`, `agent_get_run` |
+| "Walk me through what the last run actually did, step by step, and where it spent its time." | `agent_get_run` with `includeTranscript` |
+
+### Put it on a schedule
+
+Schedules live in task frontmatter: `schedule` as a five-field cron expression, `scheduleTz`, and `scheduleEnabled`.
+
+| Prompt | Tools |
+| --- | --- |
+| "Schedule `deal-brief` for 9am Eastern every weekday." | `agent_get_task`, `agent_update_task` |
+| "Pause the `daily-digest` schedule over the holidays but keep the task." | `agent_update_task` with `scheduleEnabled: false` |
+| "Pin `deal-brief` to a specific model and tell me which ones are available first." | `agent_list_available_models`, `agent_update_task` |
+
+Scheduled runs execute as the space agent, which has write access in its home space, read-only access to org-visible spaces, and no access to other private spaces. Manual runs execute with your authority. A task that works when you run it by hand and fails on its schedule is almost always this difference.
+
+### Hygiene loops
+
+An agent that runs weekly and tells you what has rotted is worth more than one that writes something new.
+
+| Prompt | Tools |
+| --- | --- |
+| "Create a weekly task in `sales` that finds records missing required fields or with `stage` values off-schema, and writes the list to `sales/reports/hygiene` with a note on what changed since last week." | `agent_create_task` |
+| "Create a task in `research` that flags any `competitor` record not reviewed in 90 days and nudges its owner." | `agent_create_task` |
+| "Create a monthly task that finds pages nothing links to and pages whose links are broken, and reports both." | `agent_create_task` |
+
+### Ingestion loops
+
+These are the ones that need a connector authorized first.
+
+| Prompt | Tools |
+| --- | --- |
+| "Create a task in `sales` that reads yesterday's call transcripts from the connected drive and files each one as a `call-note` record under the right account." | `context_space_templates`, `agent_create_task` |
+| "Create a daily task that watches the connected Slack channel for pricing decisions and appends each to `playbooks/pricing` with a date, a source link, and who decided it." | `agent_create_task` |
+| "Create a task that pulls closed issues from the connected tracker each Friday and updates the affected runbook pages." | `agent_create_task` |
+
+<Tip>
+  Have ingestion tasks write to a staging path first, such as `sales/inbox/`, and add a second task that promotes clean records into place. It costs one extra task and saves you from an agent quietly filling a space with near-duplicates.
+</Tip>
+
+### Tune a task
+
+| Prompt | Tools |
+| --- | --- |
+| "The `weekly-report` task is too verbose. Read it, tighten the instructions to a five-bullet cap, and save it." | `agent_get_task`, `agent_update_task` |
+| "Across all my tasks, which runs failed in the last week? Group by task and summarize the failures." | `agent_list_tasks`, `agent_list_runs` |
+| "Run `deal-brief` five times and give me the distribution: success rate, p50 and p95 duration, mean tokens. Flag any outlier." | `agent_run_task`, `agent_list_runs` |
+| "Token use on `deal-brief` has crept up. Compare its earliest and latest runs and tell me whether that's the space growing or the instructions changing." | `agent_list_runs`, `agent_get_task` |
+| "Estimate what `deal-brief` costs per month at its current schedule, based on actual token usage in recent runs rather than a guess." | `agent_list_runs` |
+
+## Stack them together
+
+The tools compose, and this is where a connected client starts to feel different from a search box.
+
+| Prompt | Tools |
+| --- | --- |
+| "Find the diligence-stage pages in `sales`, run `deal-brief`, then check whether its output actually referenced them." | `context_query_pages_by_metadata`, `agent_run_task`, `agent_get_run` |
+| "Read the three most recent call notes for Acme, update the account record's metadata to match what was actually said, and note in the body what you changed and why." | `context_query_pages_by_metadata`, `context_get_shared_page`, `context_set_page_metadata`, `context_update_shared_page` |
+| "Clone the `demo` agent's whole setup, instructions and every task, into a new `demo-staging` space." | `agent_get_instructions`, `agent_list_tasks`, `agent_get_task`, `context_create_space`, `agent_set_instructions`, `agent_create_task` |
+| "Set up `research` from scratch: create the space, declare a `competitor` record type, create records for these eight companies, then add a weekly agent task that keeps them reviewed." | `context_create_space`, `context_update_shared_page`, `context_create_shared_page`, `agent_create_task` |
+
+That last one is the whole page in a single prompt. It is also a reasonable way to find out how much your client can carry at once, which is worth knowing before you rely on it.
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Record types" icon="table-list" href="/concepts/records">
+    Schemas, field types, and validation in full.
+  </Card>
+
+  <Card title="Agents" icon="robot" href="/concepts/agents">
+    Personas, tasks, schedules, and execution authority.
+  </Card>
+
+  <Card title="Page metadata" icon="database" href="/concepts/page-metadata">
+    The store underneath every query on this page.
+  </Card>
+
+  <Card title="Connectors" icon="plug" href="/concepts/connectors">
+    Setting up the external access ingestion loops need.
+  </Card>
+</CardGroup>

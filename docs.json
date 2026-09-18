@@ -31,7 +31,8 @@
           "index",
           "quickstart",
           "connect-tools",
-          "connect-agents"
+          "connect-agents",
+          "prompts/gallery"
         ]
       },
       {
