@@ -172,14 +172,43 @@ console.log(run.status, run.markdown);
 
 `runTaskAndWait` queues a run and polls until it reaches a terminal status. Use `runTask` and `waitForRun` separately if you want to hold the run id in between.
 
+## Examples
+
+The [SDK repo](https://github.com/lovelybunch/coconut-sdk/tree/main/examples) ships six scripts that run against any Coconut Context deployment. Clone it and install:
+
+```bash
+git clone https://github.com/lovelybunch/coconut-sdk.git
+cd coconut-sdk
+pnpm install
+```
+
+Point the scripts at your deployment. The defaults target a local dev stack on port 8787, so against the hosted app set these three:
+
+```bash
+export COCO_BASE_URL=https://api.coconut.md
+export COCO_API_KEY=coco_...
+export COCO_SPACE=demo
+```
+
+Run example 02 first. It seeds the record type and records that the other five read.
+
+| Script | Command | What it does |
+| --- | --- | --- |
+| 01. Pull records | `pnpm example:pull` | Discovers a deployment: spaces, metadata keys, record types, a typed query, and one page as JSON and markdown with its link graph. |
+| 02. Write back | `pnpm example:write-back` | Creates a `deal-memo` record type and records from it, then patches metadata, updates bodies with optimistic concurrency, and reads the audit trail. Safe to re-run. |
+| 03. Visualize | `pnpm example:visualize` | Renders an HTML pipeline dashboard to `examples/out/` and writes a markdown summary back into the space. |
+| 04. Chat with a space | `pnpm example:chat` | A terminal chat that grounds Claude in the space and cites page paths. Needs `ANTHROPIC_API_KEY`. |
+| 05. Blame | `pnpm example:blame` | Attributes each line of a page to the revision that introduced it. Set `COCO_PAGE` to blame a different page. |
+| 06. Gardener | `pnpm example:gardener` | Reports orphan, hub, and dangling links, heals dangling links with stub pages, and writes a map of content. |
+
 ## Next steps
 
 <CardGroup cols={2}>
-  <Card title="SDK examples" icon="flask" href="/tools/sdk-examples">
-    Six runnable scripts: pull, write back, visualize, chat with a space, blame, and gardener.
-  </Card>
   <Card title="CLI" icon="terminal" href="/tools/cli">
     The same surface from a shell, with auth flows and profiles handled for you.
+  </Card>
+  <Card title="Agents" icon="robot" href="/concepts/agents">
+    Space agents run tasks on a schedule and keep pages fresh, the same way `coco.agents` does from code.
   </Card>
   <Card title="HTTP API" icon="list" href="/api-reference/overview">
     The routes underneath every SDK method.

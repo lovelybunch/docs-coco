@@ -31,8 +31,7 @@
           "index",
           "quickstart",
           "connect-tools",
-          "connect-agents",
-          "prompts/gallery"
+          "connect-agents"
         ]
       },
       {
@@ -41,7 +40,7 @@
         "pages": [
           "tools/cli",
           "tools/sdk",
-          "tools/sdk-examples"
+          "tools/prompt-gallery"
         ]
       },
       {
@@ -71,18 +70,6 @@
           "api-reference/spaces",
           "api-reference/search",
           "api-reference/admin"
-        ]
-      },
-      {
-        "group": "Solutions",
-        "icon": "lightbulb",
-        "pages": [
-          "examples/overview",
-          "examples/deal-pipeline",
-          "examples/account-research",
-          "examples/runbooks",
-          "examples/contracts",
-          "examples/suppliers"
         ]
       },
       {
@@ -126,6 +113,24 @@
       "vscode"
     ]
   },
+  "redirects": [
+    {
+      "source": "/prompts/gallery",
+      "destination": "/tools/prompt-gallery"
+    },
+    {
+      "source": "/tools/sdk-examples",
+      "destination": "/tools/sdk#examples"
+    },
+    {
+      "source": "/examples",
+      "destination": "/quickstart"
+    },
+    {
+      "source": "/examples/:slug*",
+      "destination": "/quickstart"
+    }
+  ],
   "footer": {
     "socials": {
       "x": "https://x.com/coconutdotdev",
