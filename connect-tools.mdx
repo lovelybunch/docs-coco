@@ -1,6 +1,6 @@
 ---
 title: "Connect your tools"
-description: "Wire up Claude, ChatGPT, Copilot, Cursor, or any MCP client to Coconut"
+description: "Wire up Claude, ChatGPT, Copilot, Gemini Enterprise, Cursor, Grok Bot, or any MCP client to Coconut"
 icon: "plug"
 ---
 
@@ -10,78 +10,134 @@ Coconut works with the tools you already use, from Claude and ChatGPT to any cli
 
 Claude has a listing in Anthropic's connector directory, so this is the shortest path if you're using Claude as your primary client.
 
-<Steps>
-  <Step title="Open Customize in Claude">
-    In Claude's settings, open **Customize**.
-  </Step>
-  <Step title="Select Connectors">
-    Go to the **Connectors** tab.
-  </Step>
-  <Step title="Add a connector">
-    Select **Add**, then **Browse Connectors**.
-  </Step>
-  <Step title="Find Coconut">
-    Search for "Coconut", or open the [directory listing](https://claude.ai/directory/coco) directly.
-  </Step>
-</Steps>
+<Card title="Set up in Claude" icon="list-check">
+  <Steps>
+    <Step title="Open Customize in Claude">
+      In Claude's settings, open **Customize**.
+    </Step>
+    <Step title="Select Connectors">
+      Go to the **Connectors** tab.
+    </Step>
+    <Step title="Add a connector">
+      Select **Add**, then **Browse Connectors**.
+    </Step>
+    <Step title="Find Coconut">
+      Search for "Coconut", or open the [directory listing](https://claude.ai/directory/coco) directly.
+    </Step>
+  </Steps>
+</Card>
 
 ## ChatGPT
 
 ChatGPT reaches custom MCP servers through developer mode rather than its plugin directory, so this mirrors OpenAI's own setup flow.
 
-<Steps>
-  <Step title="Turn on developer mode">
-    In ChatGPT, open **Settings**, then **Security and login**, and turn on **Developer mode**.
-  </Step>
-  <Step title="Add a connector">
-    Go to [chatgpt.com/plugins](https://chatgpt.com/plugins) and select the plus button.
-  </Step>
-  <Step title="Name the connection">
-    Enter a name and description for Coconut.
-  </Step>
-  <Step title="Paste the connector URL">
-    Under **Connection**, paste the connector URL from [Integrations](https://app.coconut.md/integrations) in the app.
-  </Step>
-  <Step title="Create and sign in">
-    Create the connection, then sign in when prompted.
-  </Step>
-</Steps>
+<Card title="Set up in ChatGPT" icon="list-check">
+  <Steps>
+    <Step title="Turn on developer mode">
+      In ChatGPT, open **Settings**, then **Security and login**, and turn on **Developer mode**.
+    </Step>
+    <Step title="Add a connector">
+      Go to [chatgpt.com/plugins](https://chatgpt.com/plugins) and select the plus button.
+    </Step>
+    <Step title="Name the connection">
+      Enter a name and description for Coconut.
+    </Step>
+    <Step title="Paste the connector URL">
+      Under **Connection**, paste the connector URL from [Integrations](https://app.coconut.md/integrations) in the app.
+    </Step>
+    <Step title="Create and sign in">
+      Create the connection, then sign in when prompted.
+    </Step>
+  </Steps>
+</Card>
 
 ## Microsoft 365 Copilot
 
 Copilot Studio's MCP wizard handles the OAuth handshake on its own, since the connector advertises dynamic client registration.
 
-<Steps>
-  <Step title="Open Tools">
-    Open your agent in [Copilot Studio](https://learn.microsoft.com/en-us/microsoft-copilot-studio/agent-extend-action-mcp), then go to **Tools**.
-  </Step>
-  <Step title="Add a new tool">
-    Select **Add a tool**, then **New tool**, then **Model Context Protocol**.
-  </Step>
-  <Step title="Name the server">
-    Name the server and paste the connector URL as the **Server URL**.
-  </Step>
-  <Step title="Choose OAuth">
-    Choose **OAuth 2.0 with dynamic discovery**, then select **Create**.
-  </Step>
-  <Step title="Add to your agent">
-    Create a connection, then select **Add to agent**.
-  </Step>
-</Steps>
+<Card title="Set up in Microsoft 365 Copilot" icon="list-check">
+  <Steps>
+    <Step title="Open Tools">
+      Open your agent in [Copilot Studio](https://learn.microsoft.com/en-us/microsoft-copilot-studio/agent-extend-action-mcp), then go to **Tools**.
+    </Step>
+    <Step title="Add a new tool">
+      Select **Add a tool**, then **New tool**, then **Model Context Protocol**.
+    </Step>
+    <Step title="Name the server">
+      Name the server and paste the connector URL as the **Server URL**.
+    </Step>
+    <Step title="Choose OAuth">
+      Choose **OAuth 2.0 with dynamic discovery**, then select **Create**.
+    </Step>
+    <Step title="Add to your agent">
+      Create a connection, then select **Add to agent**.
+    </Step>
+  </Steps>
+</Card>
+
+## Gemini Enterprise
+
+How to connect Coconut to Gemini Enterprise.
+
+<Card title="Set up in Gemini Enterprise" icon="list-check">
+  <Steps>
+    <Step title="Issue a client">
+      In Connector Governance, issue a client with the **Gemini Enterprise** preset, and keep the values it shows.
+    </Step>
+    <Step title="Open Connected apps">
+      In Gemini Enterprise, open **Manage team**, then **Connected apps**, then **Add MCP Server**.
+    </Step>
+    <Step title="Add the server URL">
+      Paste `https://api.coconut.md/mcp` as the server URL, then choose **OAuth 2.0**.
+    </Step>
+    <Step title="Paste the client details">
+      Paste the authorization URL, token URL, client ID, and client secret from Connector Governance.
+    </Step>
+    <Step title="Add the scopes and sign in">
+      Enter the scopes `context:read context:write`, select **Add**, then sign in when Gemini prompts you.
+    </Step>
+  </Steps>
+</Card>
 
 ## Cursor
 
-<Steps>
-  <Step title="Open custom MCP settings">
-    Open [Customize](https://cursor.com/docs/mcp) in the sidebar, then add a custom MCP server.
-  </Step>
-  <Step title="Add the connector URL">
-    Use the connector URL from [Integrations](https://app.coconut.md/integrations) in the app as a streamable HTTP server.
-  </Step>
-  <Step title="Sign in">
-    Sign in when Cursor prompts you to authorize.
-  </Step>
-</Steps>
+<Card title="Set up in Cursor" icon="list-check">
+  <Steps>
+    <Step title="Open custom MCP settings">
+      Open [Customize](https://cursor.com/docs/mcp) in the sidebar, then add a custom MCP server.
+    </Step>
+    <Step title="Add the connector URL">
+      Use the connector URL from [Integrations](https://app.coconut.md/integrations) in the app as a streamable HTTP server.
+    </Step>
+    <Step title="Sign in">
+      Sign in when Cursor prompts you to authorize.
+    </Step>
+  </Steps>
+</Card>
+
+## Grok Bot
+
+Grok Bot connects to Coconut with an agent key, and you set it up by asking your bot in chat.
+
+<Card title="Set up in Grok Bot" icon="list-check">
+  <Steps>
+    <Step title="Create an agent key">
+      In Coconut, open [Manage agent keys](https://app.coconut.md/admin/agent-keys) and create a key. Your bot can only reach the spaces that key can access.
+    </Step>
+    <Step title="Ask your bot to connect">
+      In your bot's chat, say: "Connect the Coconut Context connector at `https://api.coconut.md/mcp` using my API key."
+    </Step>
+    <Step title="Approve and enter the key">
+      Confirm when the bot asks, then enter your key in the secure field it shows you.
+    </Step>
+    <Step title="Check the connection">
+      Ask your bot which Coconut spaces it can see. If a space is missing or shows Forbidden, ask an admin to give your key access.
+    </Step>
+    <Step title="Give access to private spaces">
+      To let your bot into a private space, add its agent key as a member at `https://app.coconut.md/spaces/<space-path>/manage/members/add/agent`, for example [agent-olivia](https://app.coconut.md/spaces/agent-olivia/manage/members/add/agent). Pick the agent key from the list and choose the role it needs.
+    </Step>
+  </Steps>
+</Card>
 
 ## Something else
 
