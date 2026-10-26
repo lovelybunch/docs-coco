@@ -71,16 +71,6 @@
           "api-reference/search",
           "api-reference/admin"
         ]
-      },
-      {
-        "group": "Operations",
-        "icon": "gear",
-        "pages": [
-          "operations/deployment",
-          "operations/identity",
-          "operations/agents-runtime",
-          "operations/quickstart"
-        ]
       }
     ]
   },
