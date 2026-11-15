@@ -3,9 +3,9 @@
   "theme": "mint",
   "name": "Coconut",
   "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
+    "primary": "#3E6B58",
+    "light": "#7FB59C",
+    "dark": "#24473B"
   },
   "favicon": "/favicon.svg",
   "navigation": {
@@ -31,7 +31,8 @@
           "index",
           "quickstart",
           "connect-tools",
-          "connect-agents"
+          "connect-agents",
+          "assistant-instructions"
         ]
       },
       {
@@ -50,7 +51,7 @@
           "concepts/spaces-and-pages",
           "concepts/page-metadata",
           "concepts/records",
-          "concepts/agents",
+          "concepts/routines",
           "concepts/connectors",
           "concepts/templates",
           "concepts/views",
@@ -105,6 +106,10 @@
   },
   "redirects": [
     {
+      "source": "/concepts/agents",
+      "destination": "/concepts/routines"
+    },
+    {
       "source": "/prompts/gallery",
       "destination": "/tools/prompt-gallery"
     },
@@ -127,5 +132,17 @@
       "github": "https://github.com/lovelybunch",
       "linkedin": "https://www.linkedin.com/company/110260922"
     }
+  },
+  "background": {
+    "color": {
+      "light": "#F3ECDC",
+      "dark": "#1C1A14"
+    }
+  },
+  "fonts": {
+    "family": "Manrope"
+  },
+  "appearance": {
+    "default": "light"
   }
 }

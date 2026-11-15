@@ -4,7 +4,7 @@ description: "A typed TypeScript client for reading and writing your context lay
 icon: "code"
 ---
 
-The Coconut SDK is a TypeScript client for the Coconut Context HTTP API. It covers pages, structured metadata, search, templates and typed records, spaces, export and import, page links, and space agents. Reach for it when a script, a service, or an agent needs to read and write context in the language your stack already uses.
+The Coconut SDK is a TypeScript client for the Coconut Context HTTP API. It covers pages, structured metadata, search, templates and typed records, spaces, export and import, page links, and routines. Reach for it when a script, a service, or an agent needs to read and write context in the language your stack already uses.
 
 - **Zero runtime dependencies.** Built on the platform `fetch`, so it runs on Node 20 or later, Bun, Deno, and modern browsers and workers.
 - **Faithful to the API contract.** Types are transcribed from the [OpenAPI spec](https://github.com/lovelybunch/coconut-sdk/blob/main/openapi.yaml) vendored in the repo and drift-checked nightly against the deployed contract. Admin consoles, auth flows, SCIM, and billing are intentionally out of scope.
@@ -90,7 +90,7 @@ The client is one configured HTTP transport shared by a set of resource namespac
 | `coco.templates` | Page templates with normalized metadata schemas. |
 | `coco.records` | Typed-record sugar: `types(space)`, `query(space, type, …)` with an implicit template filter, and `create(space, type, …)`. |
 | `coco.spaceTemplates` | Whole-space starting kits: gallery, full bundles, create a space from a template (org admin). |
-| `coco.agents` | Space agents: rollups, model catalog, tasks with schedules, async run triggers with `waitForRun` and `runTaskAndWait`, run records and transcripts, agent instructions. |
+| `coco.agents` | Routines (the namespace keeps its original name): rollups, model catalog, routines with schedules, async run triggers with `waitForRun` and `runTaskAndWait`, run records and transcripts, shared instructions. |
 
 Two methods live on the client itself: `coco.health()` is an unauthenticated liveness probe, and `coco.session()` returns the resolved principal for the configured credential.
 
@@ -110,7 +110,7 @@ The `in` and `not-in` operators arrived in `coconut-sdk` 0.2.0. If you're pinned
 
 ## Concurrency model
 
-Page writes use the API's optimistic concurrency. Updates send `If-Match: W/"<version>"`. A missing version returns **428** (`CocoPreconditionRequiredError`), and a stale one returns **412** (`CocoVersionConflictError`). Re-read and retry, or use `pages.upsert()`, which does that loop for you. The same convention applies to agent tasks and agent instructions.
+Page writes use the API's optimistic concurrency. Updates send `If-Match: W/"<version>"`. A missing version returns **428** (`CocoPreconditionRequiredError`), and a stale one returns **412** (`CocoVersionConflictError`). Re-read and retry, or use `pages.upsert()`, which does that loop for you. The same convention applies to routines and shared instructions.
 
 ## Errors
 
@@ -153,9 +153,9 @@ try {
 | `devUser` | `X-Coco-User` | Dev-header deployments only, never production |
 | `orgSlug` / `orgId` | `X-Coco-Org-Slug` / `X-Coco-Org-Id` | Org context on multi-tenant deployments |
 
-## Space agents from code
+## Routines from code
 
-The agents namespace lets a script hand work to the deployment's own agent instead of running a model loop itself.
+The `agents` namespace manages routines, so a script can hand recurring work to the deployment instead of running a model loop itself. It does not file backlog tasks for agent spaces; create those as pages at `<agent-space>/tasks/<slug>`.
 
 ```ts
 await coco.agents.createTask("demo", "daily-digest", {
@@ -207,8 +207,8 @@ Run example 02 first. It seeds the record type and records that the other five r
   <Card title="CLI" icon="terminal" href="/tools/cli">
     The same surface from a shell, with auth flows and profiles handled for you.
   </Card>
-  <Card title="Agents" icon="robot" href="/concepts/agents">
-    Space agents run tasks on a schedule and keep pages fresh, the same way `coco.agents` does from code.
+  <Card title="Routines" icon="calendar-clock" href="/concepts/routines">
+    Routines run on a schedule and keep pages fresh, the same way `coco.agents` does from code.
   </Card>
   <Card title="HTTP API" icon="list" href="/api-reference/overview">
     The routes underneath every SDK method.

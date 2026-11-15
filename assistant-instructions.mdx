@@ -1,0 +1,112 @@
+---
+title: "Assistant instructions"
+description: "System instructions that tell your AI tools and agents to reach for Coconut before they answer"
+icon: "list-check"
+---
+
+Connecting an MCP client gives your assistant the tools. Instructions tell it when to use them. Without them, a model searches Coconut only when someone explicitly asks it to, and answers everything else from training data: a fair description of a generic B2B company, and a poor description of yours.
+
+The fix is a short block of system instructions that makes reading context the default step before answering, and makes writing context something the assistant proposes and you approve. Paste it once per tool. It applies to every conversation after that.
+
+## Where the instructions go
+
+Every client has somewhere to put persistent instructions. The names differ; the effect is the same.
+
+| Client | Where it goes | Applies to |
+| --- | --- | --- |
+| Claude | **Settings → Instructions for Claude** | Your own chats |
+| Claude | **Settings → Organization instructions** | Everyone in the organization |
+| ChatGPT | Custom instructions, or project instructions | Your own chats, or one project |
+| Cursor | Project rules, or an `AGENTS.md` at the repo root | One repository |
+| Claude Code | `CLAUDE.md`, or an `AGENTS.md` at the repo root | One repository |
+| Anything else | Whatever the runtime loads as its system prompt | Depends on the runtime |
+
+Start with your personal instructions. Once the behavior looks right to you, roll the same block out organization-wide so everyone's assistant works from the same context instead of its own habits.
+
+<Tip>
+  These instructions govern the clients you connect to Coconut. A [routine](/concepts/routines) takes its direction from the space's shared instructions at `<space>/agents/instructions` instead, and doesn't need this block.
+</Tip>
+
+## The instructions
+
+This is the block we use, verbatim. Copy it as-is, or edit it to match how your team works.
+
+````markdown
+# Coconut Context: assistant instructions
+
+Coconut Context is our shared context layer. Read from it proactively: search
+before you answer, without waiting to be asked. Writing is the opposite. Never
+save or change a page without the user's confirmation.
+
+## Reading context
+
+Before answering anything about the company, product, customers, competitors,
+strategy, brand, or process, search Coconut Context first. If you don't know the
+layout of the workspace, list the spaces once and reuse that map for the rest of
+the session.
+
+Open the most relevant pages and read them in full before relying on them.
+Search returns snippets, not whole pages. Ground answers in what you find there
+over general assumptions or training data, and name the page path that informed
+the answer. If the search turns up nothing relevant, say so plainly and proceed
+from general knowledge. Never invent a page, a path, or a citation.
+
+## Writing to shared context
+
+When a conversation produces durable, reusable knowledge others would benefit
+from (decisions, strategy, competitive findings, goals and metrics, customer or
+account detail, brand and voice standards, repeatable procedures), offer to save
+or update the relevant page.
+
+Search first and prefer updating an existing page over creating a near-duplicate.
+Check the space's templates before creating a structured record so new pages
+match the existing vocabulary and metadata keys. Confirm before writing: propose
+the space, the path, and a one-line summary of the change. Keep pages in clean
+markdown, small and well-scoped, with descriptive titles. Never put personal,
+sensitive, or draft-only material in a shared space.
+
+When reading or writing context materially shapes a response, mention briefly
+which page you used or updated so the user stays oriented.
+````
+
+## What each rule is doing
+
+| Rule | Why it's there |
+| --- | --- |
+| Search before you answer | Retrieval is the whole point, and models skip it unless told not to. This is the line that makes the difference you notice first. |
+| List the spaces once, then reuse that map | A model that doesn't know your [space](/concepts/spaces-and-pages) layout searches badly. One listing per session is enough, and repeating it wastes the context window. |
+| Open pages in full | [Search](/concepts/search) returns snippets, and a snippet is easy to misread. The page body carries the reasoning the snippet cut off. |
+| Name the page path | You can check the answer against its source, and you find out fast when a page is stale. |
+| Say so when nothing is found | The failure mode you want is "nothing in Coconut covers this", not a confident answer assembled from training data. |
+| Confirm before writing | Reads are cheap and reversible. Writes are how a shared context layer accumulates duplicates and half-finished drafts. |
+| Check templates first | A [record type](/concepts/records) declares the vocabulary and [metadata keys](/concepts/page-metadata) for its space. New pages that ignore it break the queries built on it. |
+| Nothing personal or sensitive in a shared space | Personal notes belong in a [personal space](/concepts/spaces-and-pages), which is private to you. |
+
+## Tailoring it
+
+The block above is deliberately general, because it has to work before the assistant knows anything about your workspace. Once you know which spaces matter, a few edits sharpen it:
+
+- **Name your spaces.** "Customer questions start in `sales`, product questions in `products`" routes searches faster than a description of what to search for.
+- **Constrain writes.** If only one or two spaces should ever be written to from a chat client, say which, and say that everything else is read-only.
+- **Point at the record types.** If a space has [templates](/concepts/templates), naming them tells the assistant what structured pages should look like before it drafts one.
+- **Set the house style.** A voice or writing-standards page is worth naming by path, so drafts come back sounding like your team.
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Connect your tools" icon="plug" href="/connect-tools">
+    Set up Claude, ChatGPT, Copilot, or Cursor against your context layer.
+  </Card>
+
+  <Card title="Connect your agents" icon="terminal" href="/connect-agents">
+    Connector URLs, agent tokens, and MCP client configuration.
+  </Card>
+
+  <Card title="Record types" icon="table" href="/concepts/records">
+    Templates that declare a metadata schema, so structured pages stay consistent.
+  </Card>
+
+  <Card title="Routines" icon="calendar-clock" href="/concepts/routines">
+    Scheduled and on-demand work a space runs for itself.
+  </Card>
+</CardGroup>
