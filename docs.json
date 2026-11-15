@@ -50,7 +50,7 @@
           "concepts/spaces-and-pages",
           "concepts/page-metadata",
           "concepts/records",
-          "concepts/agents",
+          "concepts/routines",
           "concepts/connectors",
           "concepts/templates",
           "concepts/views",
@@ -104,6 +104,10 @@
     ]
   },
   "redirects": [
+    {
+      "source": "/concepts/agents",
+      "destination": "/concepts/routines"
+    },
     {
       "source": "/prompts/gallery",
       "destination": "/tools/prompt-gallery"

@@ -39,7 +39,7 @@ Do this first. Most disappointing first sessions are a client guessing at a spac
 
 ## Create a space
 
-A space groups pages around a purpose and carries its own members, visibility, and agent.
+A space groups pages around a purpose and carries its own members, visibility, and routines.
 
 | Prompt | Tools |
 | --- | --- |
@@ -74,7 +74,7 @@ That makes path structure something you can ask for directly, and something you 
 | "Now do it: recreate each page at its new path with the same content, then delete the old ones." | `context_get_shared_page`, `context_create_shared_page`, `context_delete_shared_page` |
 
 <Note>
-  Two prefixes are reserved in every space. `agents/` holds the space agent's instructions, tasks, and run records, and `templates/` holds page templates. Both are hidden from ordinary listings and search, so ask for them by name when you want them.
+  Two prefixes are reserved in every space. `agents/` holds the space's routines (shared instructions, the routines, and run records), and `templates/` holds page templates. Both are hidden from ordinary listings and search, so ask for them by name when you want them.
 </Note>
 
 ## Page metadata
@@ -182,47 +182,51 @@ Your personal space is private. Nobody else in the org can read it, and it is th
 | "Append today's decisions to my running `notes/decisions` page under a dated heading." | `context_get_personal_page`, `context_update_personal_page` |
 | "Take my personal page on account strategy, strip the half-formed bits and anything about individuals, and publish what's left to `sales/playbooks/strategy`." | `context_get_personal_page`, `context_create_shared_page` |
 
-## Space agents
+## Routines
 
 <Note>
-  **Some setup happens outside these prompts.** Space agents reach Slack, Google Drive, Linear, HubSpot, and the rest through [connectors](/concepts/connectors), and no MCP tool creates or authorizes one. Connectors are added and granted in the app, on the space's **Connections** page. Any prompt below that pulls from an external system needs that done first. The agent prompts that only touch Coconut pages work straight away.
+  **Some setup happens outside these prompts.** Routines reach Slack, Google Drive, Linear, HubSpot, and the rest through [connectors](/concepts/connectors), and no MCP tool creates or authorizes one. Connectors are added and granted in the app, on the space's **Connections** page. Any prompt below that pulls from an external system needs that done first. The routine prompts that only touch Coconut pages work straight away.
 </Note>
 
-These are Coconut's own agents, not the client you are typing into. The distinction matters:
+Routines are Coconut's own scheduled work, not the client you are typing into. The distinction matters:
 
-| | Your MCP client | A space agent |
+| | Your MCP client | A routine |
 | --- | --- | --- |
 | Where it runs | On your machine, in your session | Inside the space, on Coconut's runtime |
 | When it runs | When you prompt it | On demand, or on a schedule, with nobody watching |
 | What it can reach | Whatever you have connected | The space's pages and the space's connectors |
 | What it leaves behind | A chat log | A run record on a page, with status, output, and token usage |
 
-Every space has exactly one agent, defined entirely by pages in its space: `agents/instructions` is its persona, `agents/<task>` is a task, and `agents/runs/<task>/<run-id>` is a run record. There is nothing else to provision. If you can write a page, you can build an agent.
+A routine is defined entirely by pages in its space: `agents/instructions` holds the shared instructions layered into every run, `agents/<routine>` is a routine, and `agents/runs/<routine>/<run-id>` is a run record. There is nothing else to provision. If you can write a page, you can build a routine.
+
+<Warning>
+  The `agent_*` tool names predate this vocabulary, so `agent_create_task` creates a **routine**. To add a task to an agent's backlog, ask for a page at `<agent-space>/tasks/<slug>` instead, which uses `context_create_shared_page`.
+</Warning>
 
 Because they run unattended and inside one space, they are best at the work nobody volunteers for: keeping a space tidy, and pulling the outside world in.
 
-### Meet the agent
+### Meet your routines
 
 | Prompt | Tools |
 | --- | --- |
-| "What agents do I have, and which are actually being used? Flag any space with tasks but no runs, or with instructions still unset." | `agent_list` |
-| "What are the `sales` agent's instructions right now?" | `agent_get_instructions` |
-| "Show me every task in `sales` with its schedule and last run status. Which schedules are paused?" | `agent_list_tasks` |
-| "Which models can agent tasks use here, and what's the org default?" | `agent_list_available_models` |
+| "Which spaces have routines, and which are actually being used? Flag any space with routines but no runs, or with shared instructions still unset." | `agent_list` |
+| "What are the `sales` space's shared instructions right now?" | `agent_get_instructions` |
+| "Show me every routine in `sales` with its schedule and last run status. Which schedules are paused?" | `agent_list_tasks` |
+| "Which models can routines use here, and what's the org default?" | `agent_list_available_models` |
 
-### Give it a persona
+### Set shared instructions
 
 | Prompt | Tools |
 | --- | --- |
-| "Give the `sales` agent a persona: terse, exec-facing, always cite the page it drew from, never speculate about numbers it can't source. Set it as the instructions." | `agent_set_instructions` |
-| "Compare the personas across all my agents. Are they consistent about citation and tone?" | `agent_list`, `agent_get_instructions` |
+| "Set shared instructions for the `sales` space: terse, exec-facing, always cite the page it drew from, never speculate about numbers it can't source. Save them." | `agent_set_instructions` |
+| "Compare the shared instructions across all my spaces. Are they consistent about citation and tone?" | `agent_list`, `agent_get_instructions` |
 
 ### Write a task and run it
 
 | Prompt | Tools |
 | --- | --- |
-| "Create a task in `sales` called `deal-brief` that reads every diligence-stage deal and writes a one-page summary of what moved this week." | `agent_create_task` |
-| "Turn the runbook at `engineering/runbooks/deploy` into a task that checks the deploy each morning and reports anything unexpected." | `context_get_shared_page`, `agent_create_task` |
+| "Create a routine in `sales` called `deal-brief` that reads every diligence-stage deal and writes a one-page summary of what moved this week." | `agent_create_task` |
+| "Turn the runbook at `engineering/runbooks/deploy` into a routine that checks the deploy each morning and reports anything unexpected." | `context_get_shared_page`, `agent_create_task` |
 | "Run `deal-brief` now and tell me how it went: status, duration, tokens." | `agent_run_task` |
 | "Run `deal-brief`, and if it fails, read the run record and tell me why." | `agent_run_task`, `agent_get_run` |
 | "Walk me through what the last run actually did, step by step, and where it spent its time." | `agent_get_run` with `includeTranscript` |
@@ -234,20 +238,20 @@ Schedules live in task frontmatter: `schedule` as a five-field cron expression, 
 | Prompt | Tools |
 | --- | --- |
 | "Schedule `deal-brief` for 9am Eastern every weekday." | `agent_get_task`, `agent_update_task` |
-| "Pause the `daily-digest` schedule over the holidays but keep the task." | `agent_update_task` with `scheduleEnabled: false` |
+| "Pause the `daily-digest` schedule over the holidays but keep the routine." | `agent_update_task` with `scheduleEnabled: false` |
 | "Pin `deal-brief` to a specific model and tell me which ones are available first." | `agent_list_available_models`, `agent_update_task` |
 
-Scheduled runs execute as the space agent, which has write access in its home space, read-only access to org-visible spaces, and no access to other private spaces. Manual runs execute with your authority. A task that works when you run it by hand and fails on its schedule is almost always this difference.
+Scheduled runs execute as the space agent principal, which has write access in its home space, read-only access to org-visible spaces, and no access to other private spaces. Manual runs execute with your authority. A routine that works when you run it by hand and fails on its schedule is almost always this difference.
 
 ### Hygiene loops
 
-An agent that runs weekly and tells you what has rotted is worth more than one that writes something new.
+A routine that runs weekly and tells you what has rotted is worth more than one that writes something new.
 
 | Prompt | Tools |
 | --- | --- |
-| "Create a weekly task in `sales` that finds records missing required fields or with `stage` values off-schema, and writes the list to `sales/reports/hygiene` with a note on what changed since last week." | `agent_create_task` |
-| "Create a task in `research` that flags any `competitor` record not reviewed in 90 days and nudges its owner." | `agent_create_task` |
-| "Create a monthly task that finds pages nothing links to and pages whose links are broken, and reports both." | `agent_create_task` |
+| "Create a weekly routine in `sales` that finds records missing required fields or with `stage` values off-schema, and writes the list to `sales/reports/hygiene` with a note on what changed since last week." | `agent_create_task` |
+| "Create a routine in `research` that flags any `competitor` record not reviewed in 90 days and nudges its owner." | `agent_create_task` |
+| "Create a monthly routine that finds pages nothing links to and pages whose links are broken, and reports both." | `agent_create_task` |
 
 ### Ingestion loops
 
@@ -255,20 +259,20 @@ These are the ones that need a connector authorized first.
 
 | Prompt | Tools |
 | --- | --- |
-| "Create a task in `sales` that reads yesterday's call transcripts from the connected drive and files each one as a `call-note` record under the right account." | `context_space_templates`, `agent_create_task` |
-| "Create a daily task that watches the connected Slack channel for pricing decisions and appends each to `playbooks/pricing` with a date, a source link, and who decided it." | `agent_create_task` |
-| "Create a task that pulls closed issues from the connected tracker each Friday and updates the affected runbook pages." | `agent_create_task` |
+| "Create a routine in `sales` that reads yesterday's call transcripts from the connected drive and files each one as a `call-note` record under the right account." | `context_space_templates`, `agent_create_task` |
+| "Create a daily routine that watches the connected Slack channel for pricing decisions and appends each to `playbooks/pricing` with a date, a source link, and who decided it." | `agent_create_task` |
+| "Create a routine that pulls closed issues from the connected tracker each Friday and updates the affected runbook pages." | `agent_create_task` |
 
 <Tip>
-  Have ingestion tasks write to a staging path first, such as `sales/inbox/`, and add a second task that promotes clean records into place. It costs one extra task and saves you from an agent quietly filling a space with near-duplicates.
+  Have ingestion routines write to a staging path first, such as `sales/inbox/`, and add a second routine that promotes clean records into place. It costs one extra routine and saves you from a routine quietly filling a space with near-duplicates.
 </Tip>
 
 ### Tune a task
 
 | Prompt | Tools |
 | --- | --- |
-| "The `weekly-report` task is too verbose. Read it, tighten the instructions to a five-bullet cap, and save it." | `agent_get_task`, `agent_update_task` |
-| "Across all my tasks, which runs failed in the last week? Group by task and summarize the failures." | `agent_list_tasks`, `agent_list_runs` |
+| "The `weekly-report` routine is too verbose. Read it, tighten the instructions to a five-bullet cap, and save it." | `agent_get_task`, `agent_update_task` |
+| "Across all my routines, which runs failed in the last week? Group by routine and summarize the failures." | `agent_list_tasks`, `agent_list_runs` |
 | "Run `deal-brief` five times and give me the distribution: success rate, p50 and p95 duration, mean tokens. Flag any outlier." | `agent_run_task`, `agent_list_runs` |
 | "Token use on `deal-brief` has crept up. Compare its earliest and latest runs and tell me whether that's the space growing or the instructions changing." | `agent_list_runs`, `agent_get_task` |
 | "Estimate what `deal-brief` costs per month at its current schedule, based on actual token usage in recent runs rather than a guess." | `agent_list_runs` |
@@ -281,8 +285,8 @@ The tools compose, and this is where a connected client starts to feel different
 | --- | --- |
 | "Find the diligence-stage pages in `sales`, run `deal-brief`, then check whether its output actually referenced them." | `context_query_pages_by_metadata`, `agent_run_task`, `agent_get_run` |
 | "Read the three most recent call notes for Acme, update the account record's metadata to match what was actually said, and note in the body what you changed and why." | `context_query_pages_by_metadata`, `context_get_shared_page`, `context_set_page_metadata`, `context_update_shared_page` |
-| "Clone the `demo` agent's whole setup, instructions and every task, into a new `demo-staging` space." | `agent_get_instructions`, `agent_list_tasks`, `agent_get_task`, `context_create_space`, `agent_set_instructions`, `agent_create_task` |
-| "Set up `research` from scratch: create the space, declare a `competitor` record type, create records for these eight companies, then add a weekly agent task that keeps them reviewed." | `context_create_space`, `context_update_shared_page`, `context_create_shared_page`, `agent_create_task` |
+| "Clone the `demo` space's routines, shared instructions and every routine, into a new `demo-staging` space." | `agent_get_instructions`, `agent_list_tasks`, `agent_get_task`, `context_create_space`, `agent_set_instructions`, `agent_create_task` |
+| "Set up `research` from scratch: create the space, declare a `competitor` record type, create records for these eight companies, then add a weekly routine that keeps them reviewed." | `context_create_space`, `context_update_shared_page`, `context_create_shared_page`, `agent_create_task` |
 
 That last one is the whole page in a single prompt. It is also a reasonable way to find out how much your client can carry at once, which is worth knowing before you rely on it.
 
@@ -293,8 +297,8 @@ That last one is the whole page in a single prompt. It is also a reasonable way 
     Schemas, field types, and validation in full.
   </Card>
 
-  <Card title="Agents" icon="robot" href="/concepts/agents">
-    Personas, tasks, schedules, and execution authority.
+  <Card title="Routines" icon="calendar-sync" href="/concepts/routines">
+    Shared instructions, schedules, and execution authority.
   </Card>
 
   <Card title="Page metadata" icon="database" href="/concepts/page-metadata">

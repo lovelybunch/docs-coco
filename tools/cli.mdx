@@ -1,10 +1,10 @@
 ---
 title: "CLI"
-description: "Drive spaces, pages, metadata, records, and space agents from a terminal or a CI job with coco"
+description: "Drive spaces, pages, metadata, records, and routines from a terminal or a CI job with coco"
 icon: "terminal"
 ---
 
-The Coconut CLI is a command-line client for the Coconut Context HTTP API. It covers pages, structured metadata, full-text search and metadata queries, typed records, templates, spaces (including export and import), and space agents. It's built on the [Coconut SDK](/tools/sdk), so every call goes through the same typed client; the CLI adds auth flows, profiles, and terminal UX on top.
+The Coconut CLI is a command-line client for the Coconut Context HTTP API. It covers pages, structured metadata, full-text search and metadata queries, typed records, templates, spaces (including export and import), and routines. It's built on the [Coconut SDK](/tools/sdk), so every call goes through the same typed client; the CLI adds auth flows, profiles, and terminal UX on top.
 
 Use it when you want to work with your context layer from a shell, a CI pipeline, or an agent runtime that can shell out.
 
@@ -160,7 +160,7 @@ Human-readable tables print by default. `--json` prints the raw API payload alon
 
 ## A worked session
 
-This walks the same deal-pipeline shape used in the [SDK examples](/tools/sdk#examples): author a record type, create records from it, query and patch them, move the space, then hand work to the space agent.
+This walks the same deal-pipeline shape used in the [SDK examples](/tools/sdk#examples): author a record type, create records from it, query and patch them, move the space, then hand work to a routine.
 
 <Steps>
   <Step title="Sign in">
@@ -209,7 +209,7 @@ This walks the same deal-pipeline shape used in the [SDK examples](/tools/sdk#ex
     coco spaces import demo-staging demo.json --overwrite
     ```
   </Step>
-  <Step title="Ask the space agent to work">
+  <Step title="Run a routine">
     ```bash
     coco agent task put demo daily-digest --title "Daily digest" \
       --schedule "0 7 * * 1-5" --tz UTC --enable --file digest-task.md
@@ -230,7 +230,7 @@ This walks the same deal-pipeline shape used in the [SDK examples](/tools/sdk#ex
   <Card title="Page metadata" icon="tags" href="/concepts/page-metadata">
     How keys, schemas, and the audit trail behind `coco meta` work.
   </Card>
-  <Card title="Agents" icon="robot" href="/concepts/agents">
-    Tasks, schedules, and run records behind `coco agent`.
+  <Card title="Routines" icon="calendar-sync" href="/concepts/routines">
+    Schedules and run records behind `coco agent`.
   </Card>
 </CardGroup>
