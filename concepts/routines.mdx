@@ -1,0 +1,72 @@
+---
+title: "Routines"
+description: "Scheduled and on-demand work a space runs for itself: instructions, schedules, and run records"
+icon: "calendar-sync"
+---
+
+A **routine** is a page of instructions that Coconut runs inside a space, on demand or on a schedule. Reach for one when something should happen repeatedly without anyone prompting it: a weekly sweep for records missing required fields, a competitor refresh, a reminder chasing a stale review date, a daily digest of decisions.
+
+Routines are stored as pages in the space they belong to:
+
+| Page | Role |
+| --- | --- |
+| `<space>/agents/instructions` | The space's **shared instructions**, layered into every routine run |
+| `<space>/agents/<routine>` | A routine, run on demand or on a schedule |
+| `<space>/agents/runs/<routine>/<run-id>` | A run record (status, output, usage) |
+
+The `agents/` path prefix, the API routes, and the `agent_*` MCP tool names and CLI commands predate the name "routine" and have not changed. What you read in the app and in tool titles is the new vocabulary.
+
+## Routines, agents, and tasks
+
+Three words are easy to mix up. Coconut uses each for one thing.
+
+| Term | Means | Lives at |
+| --- | --- | --- |
+| **Routine** | Recurring or on-demand instructions Coconut runs for a space | `<space>/agents/<routine>` |
+| **Agent** | A persistent teammate defined by pages: an agent space (slug `agent-*`) with instructions, goals, skills, memory, and a backlog | `agent-<name>/` |
+| **Task** | A work item in an agent space's backlog | `<agent-space>/tasks/<slug>` |
+
+If you want something to happen repeatedly or on a schedule, create a routine. If you want to hand an agent a piece of work, create a task page in its space.
+
+<Warning>
+  The MCP tools `agent_create_task` and `agent_list_tasks` work on routines, not on an agent's backlog. To add a backlog task, use `context_create_shared_page` to create `<agent-space>/tasks/<slug>` from the space's task template. If you create an unscheduled routine in an `agent-*` space, the result includes a note pointing you to the backlog path.
+</Warning>
+
+## In the app
+
+The **Routines** section of the app (`/routines`, which replaces the old `/agents` address and redirects from it) lists the spaces that have routines first, then agent spaces that have them, then your personal space.
+
+Open a space to see its routines as cards. Each card shows:
+
+- A status badge: **Scheduled**, **Paused**, or **On demand**.
+- The first paragraph of the routine's instructions.
+- The schedule with its time zone, and the next run.
+- The pinned model, if there is one.
+- The status and summary of the last run.
+
+Shared instructions, connections, and recent runs sit in the sidebar.
+
+## Schedules
+
+Schedules live in routine frontmatter (`schedule`, `scheduleTz`, `scheduleEnabled`) and are edited from the routine page's Schedule card. A routine with no schedule runs only on demand.
+
+## Execution authority
+
+- **Scheduled runs** execute as the **space agent principal**: write access in the home space, read-only on org-visible spaces, and no access to other private spaces.
+- **Manual runs** execute with the requesting user's authority.
+
+A routine that works when you run it by hand and fails on its schedule almost always hits this difference.
+
+## Driving routines programmatically
+
+Routines, runs, and shared instructions are all addressable outside the app. The commands and methods keep their `agent` names.
+
+<CardGroup cols={2}>
+  <Card title="From a terminal" icon="terminal" href="/tools/cli">
+    `coco agent task put`, `coco agent run --watch`, and `coco agent runs`.
+  </Card>
+
+  <Card title="From code" icon="code" href="/tools/sdk#routines-from-code">
+    `coco.agents.createTask(...)` and `runTaskAndWait(...)`.
+  </Card>
+</CardGroup>

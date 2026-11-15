@@ -21,7 +21,9 @@ Use these terms exactly. They match the product surface and the company's messag
 | shared space / personal space | public space / private space |
 | page metadata | tags, properties, attributes |
 | record type (a template declaring a `metadataSchema`) | model, schema object, content type |
-| space agent | bot, assistant, copilot |
+| routine (scheduled or on-demand work under a space's `agents/` pages) | scheduled task, loop, space agent, bot |
+| agent (an agent space, `agent-*`) | bot, assistant, copilot |
+| task (a work item in an agent space's `tasks/` backlog) | routine, job |
 | connector | integration, plugin |
 | organization, org | tenant, account, company (in product context) |
 | agent key, agent token | API key (when referring to Coconut credentials) |
